@@ -94,5 +94,36 @@ public class DAOEleve extends Controleur<Eleve> {
         }
         return eleve;
     }
+
+    public Eleve recherch ( int id, String name){
+        Eleve eleve = new Eleve();
+
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE id_personne = " + id + " AND nom_personne LIKE '%" + name + "%'" );
+            if(result.first())
+                eleve = new Eleve(
+                        result.getInt("id_personne"),
+                        result.getString("nom_personne"),
+                        result.getString("prenom_personne")
+                );
+            else {
+                result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE id_personne = " + id + " AND prenom_personne LIKE '%" + name + "%'");
+                if (result.first())
+                    eleve = new Eleve(
+                            result.getInt("id_personne"),
+                            result.getString("nom_personne"),
+                            result.getString("prenom_personne")
+                    );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return eleve;
+    }
+
 }
 

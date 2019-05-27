@@ -3,6 +3,7 @@ package Controleur.ControleurClasse;
 import Controleur.Connexion;
 import Modele.Niveau;
 
+import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -63,6 +64,11 @@ public class NiveauDAO extends Controleur<Niveau>{
     public Niveau find (int id, int id1, int id2){
         id1 = id2 = 0;
         final Niveau niveau = find(id);
+        return niveau;
+    }
+
+    public Niveau recherch (int id, String name){
+        Niveau niveau = new Niveau();
         return niveau;
     }
 }

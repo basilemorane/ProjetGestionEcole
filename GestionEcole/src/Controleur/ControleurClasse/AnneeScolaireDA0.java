@@ -67,5 +67,10 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         final AnneeScolaire anneeScolaire = find(id);
         return anneeScolaire;
     }
+
+    public AnneeScolaire recherch (int id, String name) {
+            AnneeScolaire year = new AnneeScolaire();
+            return year;
+    }
 }
 

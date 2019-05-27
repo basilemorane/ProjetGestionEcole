@@ -1,24 +1,25 @@
 package Vue;
 
 import Controleur.Connexion;
+import Controleur.ControleurClasse.Controleur;
+import Controleur.ControleurClasse.DAOEleve;
+import Modele.Eleve;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Udpatebdd extends JFrame implements ActionListener {
+public class Udpatebdd extends JFrame implements ActionListener, ItemListener {
     private Connexion maconnexion;
     private  JLabel Search;
+    private List Result, ListJButton;
     private JTextField lookingFor;
     private  JButton Validate;
-    private  JPanel p0, p1, nord;
+    private  JPanel p0, p1, p2, nord;
 
-    public Udpatebdd () {
+    public Udpatebdd (String tableFromDataBase) {
 
         super (" Projet : Gestion d'une école : Update the Bdd");
         setLayout(new BorderLayout());
@@ -38,6 +39,7 @@ public class Udpatebdd extends JFrame implements ActionListener {
                 /**
                  * Création des Jbuttons de la fentre
                  * JButton connection Base de Donnees
+                 * JButton pour appeller la modification dans la base de donnee d'un Object
                  */
                 Validate = new JButton("Search");
 
@@ -53,12 +55,18 @@ public class Udpatebdd extends JFrame implements ActionListener {
 
                Search = new JLabel("Search : ");
 
+                /**
+                 * initialisation des List pour afficher les resultat de la recherche
+                 */
 
+                Result =  new List(2, false);
+                ListJButton =  new List(1, false);
                 /**
                  * Initialition des panels de la fenetre
                  */
                 p0 = new JPanel();
                 p1 = new JPanel();
+                p2 = new JPanel();
                 nord = new JPanel();
 
 
@@ -68,6 +76,7 @@ public class Udpatebdd extends JFrame implements ActionListener {
                 p0.setLayout(new GridLayout(1,3));
                 p1.setLayout(new GridLayout(1,1));
                 nord.setLayout(new GridLayout(2,1));
+                p2.setLayout(new GridLayout(1, 1));
 
                 /**
                  * Ajout des objets graphique dans les panels
@@ -79,21 +88,34 @@ public class Udpatebdd extends JFrame implements ActionListener {
                 nord.add("North", p0);
                 nord.add("North", p1);
 
+
+                p2.add(Result);
+                p2.add(ListJButton);
+
                 /**
                  * Ajout des Actionlisteners sur les JButtons
                  */
                 Validate.addActionListener(this);
                 lookingFor.addActionListener(this);
+
+                /**
+                 * Ajout des Itemlisteners sur les list
+                 */
+                Result.addItemListener(this);
+
                 /**
                  * Ajout Couleur sur les panels et autre
                  */
                 p0.setBackground(Color.blue);
+                Result.setBackground(Color.GREEN);
+                ListJButton.setBackground(Color.orange);
                 /**
                  * Disposition Graphique des panels
                  */
                 nord.add("North", p0);
                 nord.add("North", p1);
                 add("North", nord);
+                add(p2);
                 /**
                  * Pour pouvoir fermer la fenetre
                  */
@@ -131,21 +153,34 @@ public class Udpatebdd extends JFrame implements ActionListener {
 
         if (source == Validate){
                String requete = lookingFor.getText();
+               Result.removeAll();
                if (requete == "") {
                    System.out.println("There no search to do.");
+                   Result.add("there no result in your requeste");
                } else {
-                   try {
-                       ArrayList<String> RequestPersonne = maconnexion.remplirChampsRequete("SELECT * FROM Personne WHERE nom_personne LIKE '%" + requete + "%'");
-                       if (RequestPersonne.size() == 0 ){
-                           RequestPersonne = maconnexion.remplirChampsRequete("SELECT * FROM Personne WHERE prenom_personne LIKE '%" + requete + "%'");
-                           System.out.println("No Match find. Sorry");
-                           System.out.println(RequestPersonne);
-                       } else
-                           System.out.println(RequestPersonne);
-                   } catch (SQLException e) {
-                       System.out.println(e);
+                   Controleur<Eleve> Eleve = new DAOEleve(maconnexion);
+                   for (int i = 0; i<10; i++){
+                       Eleve student = Eleve.recherch(i, requete);
+                       if (student.getId() != 0){
+                           Result.add(student.getNom() + " " + student.getPrenom());
+                       }
                    }
                }
+        }
+
+    }
+
+    @Override
+    @SuppressWarnings("CallThreadDumpStack")
+    public void itemStateChanged (ItemEvent e){
+
+        if (e.getSource() == Result) {
+                String personne  = Result.getSelectedItem();
+                System.out.println(personne);
+                ListJButton.removeAll();
+                ListJButton.add("Add Object at yout database");
+                ListJButton.add("Update Object at yout database");
+                ListJButton.add("Delete Object at yout database");
         }
 
     }

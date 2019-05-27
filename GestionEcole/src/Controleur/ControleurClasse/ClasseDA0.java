@@ -88,5 +88,10 @@ public class ClasseDA0 extends Controleur<Classe>{
         }
         return TD;
     }
+
+    public Classe recherch (int id, String name){
+        Classe classe = new Classe();
+        return classe;
+    }
 }
 

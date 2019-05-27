@@ -36,9 +36,9 @@ public class Window extends JFrame implements ActionListener, ItemListener {
          * JButton connection Base de Donnees
          */
         connect = new JButton("Connexion BDD");
-        JBclasse = new JButton("Classe");
-        JBeleve = new JButton("Eleve");
-        JBteacher = new JButton("Teacher");
+        JBclasse = new JButton("Personne");
+        JBeleve = new JButton("Classe");
+        JBteacher = new JButton("je sais pas encore");
 
         /**
          * Création des Listes pour les tables
@@ -181,13 +181,6 @@ public class Window extends JFrame implements ActionListener, ItemListener {
                     System.out.println("Succes to connect");
                    System.out.println( maconnexion.remplirChampsRequete("SELECT nom_ecole FROM Ecole WHERE id_ecole = 1"));
 
-                    /**
-                     * On enleve tous les éléments présent sur le panel que l'on va utiliser
-                     * panel p2
-                     */
-                    p2.removeAll();
-
-
                     Controleur<Eleve> eleveDao = new DAOEleve(maconnexion);
                     for(int i = 1; i < 6; i++){
                         Eleve eleve = eleveDao.find(i);
@@ -218,7 +211,7 @@ public class Window extends JFrame implements ActionListener, ItemListener {
                 sqlE.printStackTrace();
             }
         } else if (source == JBclasse){
-                Udpatebdd upd = new Udpatebdd();
+                Udpatebdd upd = new Udpatebdd("personne");
         }
     }
 
@@ -289,7 +282,11 @@ public class Window extends JFrame implements ActionListener, ItemListener {
                    this.classeSelelect.add(classe);
                }
            }
-
+           /**
+            * On appelle la classe DAOELeve
+            * On utlise la methode FIND
+            * requete en fonction de l'ID de la classe de l'élève
+            */
            Controleur<Eleve> Eleve = new DAOEleve(maconnexion);
            for (int i = 0; i<10; i++){
                System.out.println(this.classeSelelect.get(0).getId());
