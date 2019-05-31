@@ -1,6 +1,7 @@
 package Controleur.ControleurClasse;
 
 import Controleur.Connexion;
+import Modele.AnneeScolaire;
 import Modele.Niveau;
 
 import java.sql.ResultSet;
@@ -61,12 +62,11 @@ public class NiveauDAO extends Controleur<Niveau>{
             stmt.executeUpdate("Update Niveau Set nom_niveau = '" + newName + "' Where id_niveau= " + i + " AND nom_niveau = '" + obj.getNom() + "'");
         }
         System.out.println("School level updating");
-
         return true;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
+        } catch (SQLException e) {
+            e.printStackTrace();
+             return false;
+        }
     }
 
     public Niveau find(int id) {
@@ -134,6 +134,10 @@ public class NiveauDAO extends Controleur<Niveau>{
     public Niveau recherch (int id, String name){
         Niveau niveau = new Niveau();
         return niveau;
+    }
+
+    public Niveau find (Niveau obj){
+        return obj;
     }
 }
 

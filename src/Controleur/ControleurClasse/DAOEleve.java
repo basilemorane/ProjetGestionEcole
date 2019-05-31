@@ -1,6 +1,7 @@
 package Controleur.ControleurClasse;
 
 import Controleur.Connexion;
+import Modele.AnneeScolaire;
 import Modele.Eleve;
 import Modele.Inscription;
 import Modele.Niveau;
@@ -45,6 +46,10 @@ public class DAOEleve extends Controleur<Eleve> {
             }
             return eleve;
         }
+
+    public Eleve find (Eleve obj){
+        return obj;
+    }
 
 
     public Eleve find(int id, String name) {

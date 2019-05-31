@@ -51,6 +51,8 @@ public abstract class Controleur <T> {
 
         public abstract T recherch (int id, String name);
 
+        public abstract T find (T obj);
+
         public abstract ArrayList<T> findAll();
 
     }

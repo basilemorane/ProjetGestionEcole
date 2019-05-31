@@ -6,16 +6,13 @@ package Vue;
 
 import java.awt.event.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import javax.swing.*;
 import Controleur.Connexion;
 import Controleur.ControleurClasse.*;
 import Modele.AnneeScolaire;
+import Modele.Classe;
 import Modele.Niveau;
 import Controleur.AbstractTable;
-import Controleur.TableAnneScolaire;
-import Controleur.TableLevel;
-
 
 /**
  * @author basile, benoit, Alexandre
@@ -25,8 +22,6 @@ public class RootWindow extends JFrame {
     /**
      * Attributs utilse pour afficher les tables
      */
-    private int nombreannee = 3;
-
     private JPanel JPanelRoot;
     private JPanel JPanelConnect;
     private JLabel loginbdd;
@@ -91,14 +86,27 @@ public class RootWindow extends JFrame {
     private JButton NewnameClasseJButton;
     private JTable table1;
     private JTable table2;
-    private JTextField textField1;
-    private JButton button1;
+    private JTextField newNameClasseUpdate;
+    private JButton UpdateClasseJButton;
     private JComboBox SelectClasseUpdate;
     private JComboBox SelectlevelDelete;
     private JButton LevelDelete;
     private JComboBox SelctLevelUpdate;
     private JTextField SelectLevelUpdateTexte;
     private JButton LevelUpdateJButton;
+    private JComboBox SelectClassDelete;
+    private JButton ClassDeleteJButton;
+    private JComboBox SelectUpdateYearClasse;
+    private JComboBox SelectUpdatelevelClasse;
+    private JTabbedPane StudentTabbed;
+    private JPanel ShowStudent;
+    private JPanel AddStudent;
+    private JPanel UpdateStudent;
+    private JPanel DeleteStudent;
+    private JPanel GradesStudent;
+    private JComboBox comboBoxYearStudent;
+    private JComboBox comboBoxLevelStudent;
+    private JComboBox comboBoxClasseStudent;
 
     private Connexion maconnexion ;
 
@@ -297,21 +305,22 @@ public class RootWindow extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 SelectYearClasse.removeAllItems();
+                SelectUpdatelevelClasse.removeAllItems();
+                SelectUpdateYearClasse.removeAllItems();
                     new AnneeScolaireDA0(maconnexion).findAll().forEach(anneeScolaire -> {
                         SelectYearClasse.addItem(anneeScolaire.getYear());
+                        SelectUpdateYearClasse.addItem(anneeScolaire.getYear());
                     });
                 SelectNiveau.removeAllItems();
                     new NiveauDAO(maconnexion).findAll().forEach((niveau)->{
                         SelectNiveau.addItem(niveau.getNom());
+                        SelectUpdatelevelClasse.addItem(niveau.getNom());
                     });
-
-                //SelectClasseUpdate.removeAllItems();
                 }
         });
 
                 /**
                  * Losque l'on sélectionne une année pour les classes scolaires
-                 *
                  */
         SelectYearClasse.addActionListener(new ActionListener() {
             @Override
@@ -333,6 +342,7 @@ public class RootWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SelectClasseUpdate.removeAllItems();
+                SelectClassDelete.removeAllItems();
                 String yearClasse = (String) SelectYearClasse.getSelectedItem();
                 String levelClasse = (String) SelectNiveau.getSelectedItem();
 
@@ -341,9 +351,154 @@ public class RootWindow extends JFrame {
 
                 new ClasseDA0(maconnexion).findAll(1, idyearClasse, idLevelClasse).forEach(classe -> {
                     SelectClasseUpdate.addItem(classe.getName());
+                    SelectClassDelete.addItem(classe.getName());
                 });
             }
         });
+        /**
+         * Méthode pour ajouter une classe dans la base de données
+         */
+        NewnameClasseJButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String yearClasse = (String) SelectYearClasse.getSelectedItem();
+                String levelClasse = (String) SelectNiveau.getSelectedItem();
+                int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
+                int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
+
+                String newNameClasse = NewClassenameTexte.getText();
+
+                Classe newClasse = new Classe(0, newNameClasse, idyearClasse, idLevelClasse);
+                try {
+                    new ClasseDA0(maconnexion).create(newClasse);
+                    ErrorMessage.setText("Class adding in the database");
+                } catch (ExceptionAlreadyExistant evt){
+                    ErrorMessage.setText("This class already exist in the database");
+                }
+            }
+        });
+
+        /**
+         * Méthode pour supprimer une classe
+         */
+
+        ClassDeleteJButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SelectClassDelete.removeAllItems();
+
+                String yearClasse = (String) SelectYearClasse.getSelectedItem();
+                String levelClasse = (String) SelectNiveau.getSelectedItem();
+                int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
+                int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
+                String SelectClass = (String) SelectClassDelete.getSelectedItem();
+
+                Classe deleteClasse = new Classe(0, SelectClass, idyearClasse, idLevelClasse);
+
+                new ClasseDA0(maconnexion).delete(deleteClasse);
+                ErrorMessage.setText("Classe deleting from the database");
+            }
+        });
+
+        /**
+         * Appel de la méthode pour modifier les éléments de la classe CLASSE
+         * seulemnt modifier :
+         * l'année de la classe
+         * le niveau de la classe
+         * le nom de la classe
+         */
+        UpdateClasseJButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                /**
+                 * On retoruve l'id de la classe sléectionnée par l'utilsiateur
+                 * On peut ainsi facilement retrouvé modifiler les variables de cette item
+                 */
+                String yearClasse = (String) SelectYearClasse.getSelectedItem();
+                String levelClasse = (String) SelectNiveau.getSelectedItem();
+                int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
+                int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
+                String SelectClassName = (String) SelectClassDelete.getSelectedItem();
+                int id =  new ClasseDA0(maconnexion).find(new Classe(0, SelectClassName, idyearClasse, idLevelClasse)).getId();
+
+                /**
+                 * On récupère les changements de varibles de l'item sélectionnée
+                 * On instancie a nouveau l'item sélectionnée
+                 */
+                String newNameClasse = newNameClasseUpdate.getText();
+                int newidyearClasse = new AnneeScolaireDA0(maconnexion).find(1,(String) SelectUpdateYearClasse.getSelectedItem() ).getId();
+                int newidLevelClasse = new NiveauDAO(maconnexion).find(1, (String) SelectUpdatelevelClasse.getSelectedItem()).getId();
+
+                new ClasseDA0(maconnexion).update(new Classe(id, newNameClasse, newidyearClasse, newidLevelClasse), "");
+                ErrorMessage.setText("Class updating succefull");
+
+            }
+        });
+
+        /**
+         * STUDENT
+         * Afficher dans les comboBOX les années scolaires, les niveaux scolaires et les classes
+         * On récupère ainsi tous les élèves d'une classe
+         */
+
+
+        StudentTabbed.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                comboBoxYearStudent.removeAllItems();
+
+                new AnneeScolaireDA0(maconnexion).findAll().forEach(anneeScolaire -> {
+                    comboBoxYearStudent.addItem(anneeScolaire.getYear());
+                });
+            }
+        });
+
+        comboBoxYearStudent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                comboBoxLevelStudent.removeAllItems();
+
+                new NiveauDAO(maconnexion).findAll().forEach((niveau) -> {
+                    comboBoxLevelStudent.addItem(niveau.getNom());
+                });
+            }
+        });
+
+        comboBoxLevelStudent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                comboBoxClasseStudent.removeAllItems();
+
+                String yearClasse = (String) comboBoxYearStudent.getSelectedItem();
+                String levelClasse = (String) comboBoxLevelStudent.getSelectedItem();
+
+                int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
+                int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
+
+                new ClasseDA0(maconnexion).findAll(1, idyearClasse, idLevelClasse).forEach(classe -> {
+                    comboBoxClasseStudent.addItem(classe.getName());
+                });
+            }
+        });
+
+        /**
+         * Pour ajouter une personne
+         */
+
+        /**
+         * Pour modifier une personne
+         */
+
+        /**
+         * Pour supprimer une personne
+         */
+
+        /**
+         * JE SAIS PAS OU METTRE L'AJOUT DE PERSONNE DANS UNE CLASSE AINSI QUE LA SUPPREMSION D'UNE PERSONNE DANS LA CLASSE
+         * A Y PENSER
+         * VOILA VOILA
+         */
     }
     private void createUIComponents() {
         // TODO: place custom component creation code here

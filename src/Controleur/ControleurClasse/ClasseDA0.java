@@ -21,16 +21,15 @@ public class ClasseDA0 extends Controleur<Classe>{
 
     public boolean create(Classe obj) throws ExceptionAlreadyExistant {
         try {
-            for ( int i=1; i< this.nombre_classe+1; i++){
                 ResultSet result = this.connect.getConn().createStatement(
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM classe WHERE id_classe = "+ i + " AND nom_classe ='" + obj.getName() +"'");
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM classe WHERE id_ecole = 1 AND nom_classe ='" + obj.getName() +"' AND id_niveau =" + obj.getIdNiveau() + " AND id_annee_scolaire = " + obj.getIdAnneeScolaire());
                 if(result.first()) {
                     throw new ExceptionAlreadyExistant();
                 }
-            }
+
             Statement stmt =  this.connect.getConn().createStatement();
-            stmt.executeUpdate("Insert INTO classe VALUES (Null,'" + obj.getName()+"')");
+            stmt.executeUpdate("Insert INTO classe VALUES (Null,'" + obj.getName()+"', 1, " + obj.getIdAnneeScolaire()+", "+ obj.getIdNiveau()+")");
             System.out.println("New school classe create in the databse : ");
             this.nombre_classe+=1;
             return true;
@@ -41,10 +40,37 @@ public class ClasseDA0 extends Controleur<Classe>{
     }
 
     public boolean delete(Classe obj) {
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM classe WHERE id_ecole = 1 AND nom_classe ='" + obj.getName() +"' AND id_niveau =" + obj.getIdNiveau() + " AND id_annee_scolaire = " + obj.getIdAnneeScolaire());
+            if(result.first()) {
+                Statement stmt = this.connect.getConn().createStatement();
+                stmt.executeUpdate("Delete From Classe Where id_classe = " + result.getInt("id_classe"));
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
         return false;
     }
 
     public boolean update(Classe obj, String newName) {
+        newName ="";
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM classe WHERE id_classe = " + obj.getId());
+            if(result.first()) {
+                Statement stmt = this.connect.getConn().createStatement();
+                stmt.executeUpdate(" Update Classe Set nom_classe = '" + obj.getName() + "', id_annee_scolaire = " + obj.getIdAnneeScolaire() + ", id_niveau = " + obj.getIdNiveau() + " Where id_classe = " + result.getInt("id_classe"));
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
         return false;
     }
 
@@ -92,6 +118,27 @@ public class ClasseDA0 extends Controleur<Classe>{
         }
         return TD;
     }
+
+    public Classe find (Classe obj) {
+        Classe classe = new Classe();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM classe WHERE id_ecole = 1 AND nom_classe ='" + obj.getName() +"' AND id_niveau =" + obj.getIdNiveau() + " AND id_annee_scolaire = " + obj.getIdAnneeScolaire());
+            if(result.first()) {
+            classe = new Classe(
+                        result.getInt("id_classe"),
+                        result.getString("nom_classe"),
+                        result.getInt("id_niveau"),
+                        result.getInt("id_annee_scolaire")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+       return classe;
+    }
+
 
     public Classe find(int id, String name) {
         Classe TD = new Classe();

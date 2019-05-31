@@ -71,6 +71,10 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         }
     }
 
+    public AnneeScolaire find (AnneeScolaire obj){
+        return obj;
+    }
+
     public AnneeScolaire find(int id) {
         AnneeScolaire year = new AnneeScolaire();
 

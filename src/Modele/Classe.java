@@ -49,4 +49,12 @@ public class Classe {
     public void setId(int id) {
         this.id = id;
     }
+
+    public int getIdAnneeScolaire() {
+        return idAnneeScolaire;
+    }
+
+    public int getIdNiveau () {
+        return idNiveau;
+    }
 }
