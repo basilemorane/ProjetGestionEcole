@@ -107,6 +107,7 @@ public class RootWindow extends JFrame {
     private JComboBox comboBoxYearStudent;
     private JComboBox comboBoxLevelStudent;
     private JComboBox comboBoxClasseStudent;
+    private JComboBox comboBoxSelectStudentUpdate;
 
     private Connexion maconnexion ;
 
@@ -451,6 +452,8 @@ public class RootWindow extends JFrame {
                 new AnneeScolaireDA0(maconnexion).findAll().forEach(anneeScolaire -> {
                     comboBoxYearStudent.addItem(anneeScolaire.getYear());
                 });
+
+
             }
         });
 
@@ -482,6 +485,29 @@ public class RootWindow extends JFrame {
             }
         });
 
+        comboBoxClasseStudent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                comboBoxSelectStudentUpdate.removeAllItems();
+
+                String yearClasse = (String) comboBoxYearStudent.getSelectedItem();
+                String levelClasse = (String) comboBoxLevelStudent.getSelectedItem();
+                String nameClasse = (String) comboBoxClasseStudent.getSelectedItem();
+
+                int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
+                int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
+
+               int idClasse = new ClasseDA0(maconnexion).find(new Classe(1,nameClasse, idyearClasse, idLevelClasse)).getId();
+
+              new DAOEleve(maconnexion).findAll(idClasse).forEach(eleve -> {
+                  comboBoxSelectStudentUpdate.addItem(eleve.getNom() + " " +eleve.getPrenom());
+              });
+
+            }
+        });
+
+
+
         /**
          * Pour ajouter une personne
          */
@@ -489,6 +515,7 @@ public class RootWindow extends JFrame {
         /**
          * Pour modifier une personne
          */
+
 
         /**
          * Pour supprimer une personne

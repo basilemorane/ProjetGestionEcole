@@ -1,10 +1,7 @@
 package Controleur.ControleurClasse;
 
 import Controleur.Connexion;
-import Modele.AnneeScolaire;
-import Modele.Eleve;
-import Modele.Inscription;
-import Modele.Niveau;
+import Modele.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -131,18 +128,50 @@ public class DAOEleve extends Controleur<Eleve> {
         }
         return eleve;
     }
+    public ArrayList<Eleve> findAll (int id2) {
+        ArrayList<Eleve> ArrayList = new ArrayList<>();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    //ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT DISCTINCT * FROM personne INNER JOIN inscription ON personne.id_personne = inscription.id_personne AND inscription.id_classe = " + id2);
+                   // ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM inscription WHERE id_classe = " + id2 );
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne INNER JOIN inscription On inscription.id_classe = "+ id2 + " AND personne.id_personne = inscription.id_personne");
+            while (result.next()) {
+                ArrayList.add(new Eleve(
+                        result.getInt("id_personne"),
+                        result.getString("nom_personne"),
+                        result.getString("prenom_personne")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ArrayList;
+    }
+
     public ArrayList<Eleve> findAll () {
         ArrayList<Eleve> ArrayList = new ArrayList<>();
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Eleve");
-            if(result.first())
-                ArrayList.add( new Eleve(
-                        result.getInt("id_personne"),
-                        result.getString("nom_personne"),
-                        result.getString("prenom_personne")
-                ));
+                    //ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT DISCTINCT * FROM personne INNER JOIN inscription ON personne.id_personne = inscription.id_personne AND inscription.id_classe = " + id2);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM inscription " );
+            if (result.first()) {
+                Inscription inscription = new Inscription(
+                        result.getInt("id_inscription"),
+                        result.getInt("id_classe"),
+                        result.getInt("id_personne")
+                );
+                result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE id_personne = " + inscription.getId() + " AND type_personne = '0'");
+                if (result.first())
+                    ArrayList.add(new Eleve(
+                            result.getInt("id_personne"),
+                            result.getString("nom_personne"),
+                            result.getString("prenom_personne")
+                    ));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
