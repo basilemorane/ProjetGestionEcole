@@ -17,7 +17,7 @@ numero INT(11) NOT NULL,
 debut DATE NOT NULL,
 fin DATE NOT NULL,
 id_annee_scolaire INT (11) NOT NULL,
-FOREIGN KEY (id_annee_scolaire) REFERENCES AnneeScolaire(id_annee_scolaire)
+FOREIGN KEY (id_annee_scolaire) REFERENCES AnneeScolaire(id_annee_scolaire) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
 
 CREATE TABLE Niveau
@@ -33,9 +33,9 @@ nom_classe  VARCHAR(255) NOT NULL,
 id_ecole INT(11) NOT NULL,
 id_niveau INT(11) NOT NULL,
 id_annee_scolaire INT (11) NOT NULL,
-FOREIGN KEY (id_ecole) REFERENCES Ecole (id_ecole),
-FOREIGN KEY (id_niveau) REFERENCES Niveau(id_niveau),
-FOREIGN KEY (id_annee_scolaire) REFERENCES AnneeScolaire(id_annee_scolaire)
+FOREIGN KEY (id_ecole) REFERENCES Ecole (id_ecole) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (id_niveau) REFERENCES Niveau(id_niveau) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (id_annee_scolaire) REFERENCES AnneeScolaire(id_annee_scolaire)ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
 
 CREATE TABLE Discipline
@@ -58,9 +58,9 @@ CREATE TABLE Enseignement
     id_classe INT(11) NOT NULL,
     id_discipline INT(11) NOT NULL,
     id_personne INT(11) NOT NULL,
-    FOREIGN KEY (id_classe) REFERENCES Classe (id_classe),
-    FOREIGN KEY (id_discipline) REFERENCES Discipline (id_discipline),
-    FOREIGN KEY (id_personne) REFERENCES Personne (id_personne)
+    FOREIGN KEY (id_classe) REFERENCES Classe (id_classe) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_discipline) REFERENCES Discipline (id_discipline) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_personne) REFERENCES Personne (id_personne) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
 
 CREATE TABLE INSCRIPTION
@@ -68,8 +68,8 @@ CREATE TABLE INSCRIPTION
     id_inscription INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     id_classe INT(11) NOT NULL,
     id_personne INT(11) NOT NULL,
-    FOREIGN KEY (id_classe) REFERENCES Classe (id_classe),
-    FOREIGN KEY (id_personne) REFERENCES Personne (id_personne)
+    FOREIGN KEY (id_classe) REFERENCES Classe (id_classe) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_personne) REFERENCES Personne (id_personne) ON DELETE CASCADE ON UPDATE CASCADE
 )ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
 
 

@@ -1,6 +1,8 @@
 package Controleur.ControleurClasse;
 import Controleur.Connexion;
 
+import java.util.ArrayList;
+
 public abstract class Controleur <T> {
 
         protected Connexion connect = null;
@@ -14,7 +16,7 @@ public abstract class Controleur <T> {
          * @param obj
          * @return boolean
          */
-        public abstract boolean create(T obj) throws Exception;
+        public abstract boolean create(T obj) throws ExceptionAlreadyExistant;
 
         /**
          * Méthode pour effacer
@@ -28,7 +30,7 @@ public abstract class Controleur <T> {
          * @param obj
          * @return boolean
          */
-        public abstract boolean update(T obj);
+        public abstract boolean update(T obj, String newName);
 
         /**
          * Méthode de recherche des informations
@@ -48,5 +50,8 @@ public abstract class Controleur <T> {
         public abstract T find (int id, int id1, int id2);
 
         public abstract T recherch (int id, String name);
+
+        public abstract ArrayList<T> findAll();
+
     }
 

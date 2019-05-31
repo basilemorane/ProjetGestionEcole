@@ -3,9 +3,11 @@ package Controleur.ControleurClasse;
 import Controleur.Connexion;
 import Modele.Eleve;
 import Modele.Inscription;
+import Modele.Niveau;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class DAOEleve extends Controleur<Eleve> {
 
@@ -21,7 +23,7 @@ public class DAOEleve extends Controleur<Eleve> {
             return false;
         }
 
-        public boolean update(Eleve obj) {
+        public boolean update(Eleve obj, String newName) {
             return false;
         }
 
@@ -123,6 +125,23 @@ public class DAOEleve extends Controleur<Eleve> {
             e.printStackTrace();
         }
         return eleve;
+    }
+    public ArrayList<Eleve> findAll () {
+        ArrayList<Eleve> ArrayList = new ArrayList<>();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Eleve");
+            if(result.first())
+                ArrayList.add( new Eleve(
+                        result.getInt("id_personne"),
+                        result.getString("nom_personne"),
+                        result.getString("prenom_personne")
+                ));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ArrayList;
     }
 
 }
