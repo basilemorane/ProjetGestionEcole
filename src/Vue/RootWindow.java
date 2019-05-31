@@ -499,6 +499,10 @@ public class RootWindow extends JFrame {
          * A Y PENSER
          * VOILA VOILA
          */
+
+        /**
+         * Je pense mettre un genre de truc un nouvelle onglet sur les classe ou tu peux selectionner tous les eleves sans classe
+         */
     }
     private void createUIComponents() {
         // TODO: place custom component creation code here
