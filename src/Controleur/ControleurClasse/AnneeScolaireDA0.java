@@ -23,14 +23,12 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
     public boolean create(AnneeScolaire obj) throws ExceptionAlreadyExistant {
 
         try {
-            for ( int i=1; i< this.nombre_année_scolaire+1; i++){
                 ResultSet result = this.connect.getConn().createStatement(
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE id_annee_scolaire = "+ i + " AND nom_anneScolaire ='" + obj.getYear() +"'");
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE nom_anneScolaire ='" + obj.getYear() +"'");
                 if(result.first()) {
                     throw new ExceptionAlreadyExistant();
                 }
-            }
             Statement stmt =  this.connect.getConn().createStatement();
             stmt.executeUpdate("Insert INTO AnneeScolaire VALUES (Null,'" + obj.getYear()+"')");
                 System.out.println("New school year create in the databse : ");
@@ -45,16 +43,20 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
     public boolean delete(AnneeScolaire obj) {
 
         try {
-            for ( int i=1; i< this.nombre_année_scolaire+1; i++) {
-                Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("Delete From AnneeScolaire Where id_annee_scolaire = '" + i + "' AND nom_anneScolaire = '" + obj.getYear() + "'");
-            }
-            System.out.println("School year delete ");
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE nom_anneScolaire ='" + obj.getYear() +"'");
+                    if ( result.first()){
+                        Statement stmt = this.connect.getConn().createStatement();
+                        stmt.executeUpdate("Delete From AnneeScolaire Where id_annee_scolaire = " + result.getInt("id_annee_scolaire"));
+                        System.out.println("School year delete ");
+                        return true;
+                    }
+            } catch (SQLException e) {
+                 e.printStackTrace();
+
         }
+        return false;
     }
 
     public boolean update(AnneeScolaire obj, String newName) {
@@ -130,7 +132,7 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         try {
             ResultSet result =  this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire "); //order by nom_anneScolaire DESC");
             while (result.next()){
                 YearArrayList.add( new AnneeScolaire(
                         result.getInt("id_annee_scolaire"),

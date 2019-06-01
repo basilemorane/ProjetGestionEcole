@@ -8,13 +8,13 @@ public class Eleve {
     //Prénom de l'élève
     private String prenom = "";
     // Type
-    private Boolean type = false;
+    private int type = 0;
 
     public Eleve(int id, String nom, String prenom) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
-        this.type = false;
+        this.type = 0;
     }
     public Eleve(){};
 

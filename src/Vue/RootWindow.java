@@ -9,9 +9,7 @@ import java.sql.SQLException;
 import javax.swing.*;
 import Controleur.Connexion;
 import Controleur.ControleurClasse.*;
-import Modele.AnneeScolaire;
-import Modele.Classe;
-import Modele.Niveau;
+import Modele.*;
 import Controleur.AbstractTable;
 
 /**
@@ -108,6 +106,15 @@ public class RootWindow extends JFrame {
     private JComboBox comboBoxLevelStudent;
     private JComboBox comboBoxClasseStudent;
     private JComboBox comboBoxSelectStudentUpdate;
+    private JTextField lastnameNEwStudent;
+    private JTextField nameNewStudent;
+    private JButton StudentAddJBubtton;
+    private JComboBox SelectStudentDelete;
+    private JButton StudentDelete;
+    private JRadioButton confirmDeleteStudent;
+    private JTextField newlastnameStudentUpdatetexte;
+    private JTextField newnameStudentUpdatetexte;
+    private JButton updateStudentJButton;
 
     private Connexion maconnexion ;
 
@@ -419,9 +426,8 @@ public class RootWindow extends JFrame {
                 String levelClasse = (String) SelectNiveau.getSelectedItem();
                 int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
                 int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
-                String SelectClassName = (String) SelectClassDelete.getSelectedItem();
+                String SelectClassName = (String) SelectClasseUpdate.getSelectedItem();
                 int id =  new ClasseDA0(maconnexion).find(new Classe(0, SelectClassName, idyearClasse, idLevelClasse)).getId();
-
                 /**
                  * On récupère les changements de varibles de l'item sélectionnée
                  * On instancie a nouveau l'item sélectionnée
@@ -433,6 +439,16 @@ public class RootWindow extends JFrame {
                 new ClasseDA0(maconnexion).update(new Classe(id, newNameClasse, newidyearClasse, newidLevelClasse), "");
                 ErrorMessage.setText("Class updating succefull");
 
+            }
+        });
+
+        SelectClasseUpdate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String SelectClassName = (String) SelectClasseUpdate.getSelectedItem();
+                newNameClasseUpdate.setText(SelectClassName);
+                SelectUpdateYearClasse.setSelectedItem(SelectYearClasse.getSelectedItem());
+                SelectUpdatelevelClasse.setSelectedItem(SelectNiveau.getSelectedItem());
             }
         });
 
@@ -448,12 +464,16 @@ public class RootWindow extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 comboBoxYearStudent.removeAllItems();
+                SelectStudentDelete.removeAllItems();
+
+                comboBoxSelectStudentUpdate.removeAllItems();
+
+                newlastnameStudentUpdatetexte.setText("");
+                newnameStudentUpdatetexte.setText("");
 
                 new AnneeScolaireDA0(maconnexion).findAll().forEach(anneeScolaire -> {
                     comboBoxYearStudent.addItem(anneeScolaire.getYear());
                 });
-
-
             }
         });
 
@@ -489,6 +509,7 @@ public class RootWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 comboBoxSelectStudentUpdate.removeAllItems();
+                SelectStudentDelete.removeAllItems();
 
                 String yearClasse = (String) comboBoxYearStudent.getSelectedItem();
                 String levelClasse = (String) comboBoxLevelStudent.getSelectedItem();
@@ -501,25 +522,101 @@ public class RootWindow extends JFrame {
 
               new DAOEleve(maconnexion).findAll(idClasse).forEach(eleve -> {
                   comboBoxSelectStudentUpdate.addItem(eleve.getNom() + " " +eleve.getPrenom());
+                  SelectStudentDelete.addItem(eleve.getNom() + " " + eleve.getPrenom());
               });
 
+            }
+        });
+
+        /**
+         * Pour ajouter une personne
+         */
+        StudentAddJBubtton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String yearClasse = (String) comboBoxYearStudent.getSelectedItem();
+                String levelClasse = (String) comboBoxLevelStudent.getSelectedItem();
+                String nameClasse = (String) comboBoxClasseStudent.getSelectedItem();
+
+                int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
+                int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
+
+                String nameStudent = nameNewStudent.getText();
+                String lastnameStudent = lastnameNEwStudent.getText();
+                try {
+                    new DAOEleve(maconnexion).create(new Eleve(1, lastnameStudent, nameStudent));
+                } catch (ExceptionAlreadyExistant evt){
+                    ErrorMessage.setText(evt.getMessage());
+                }
+                int idStudent =  new DAOEleve(maconnexion).find(new Eleve(1, lastnameStudent, nameStudent)).getId();
+                int idClasse = new ClasseDA0(maconnexion).find(new Classe(1,nameClasse, idyearClasse, idLevelClasse)).getId();
+
+                try {
+                    new InscriptionDAO(maconnexion).create(new Inscription(1,idClasse, idStudent));
+                } catch (ExceptionAlreadyExistant evtevt) {
+                    ErrorMessage.setText("Problem in the inscription of the student");
+                }
+            }
+        });
+
+        /**
+         * Pour modifier une personne
+         * LOSRQUE QUE L'ON CLIQUE Sur la box de slection
+         * on affiche dans les textes fills
+         * le nom
+         * le prénom
+         * l'année
+         * le niveau
+         * la classe
+         */
+
+        comboBoxSelectStudentUpdate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                comboBoxSelectStudentUpdate.getAccessibleContext();
+                String lastnameNameStudent = (String) comboBoxSelectStudentUpdate.getSelectedItem();
+                    String[] data = lastnameNameStudent.split(" ", 2);
+                    newlastnameStudentUpdatetexte.setText(data[0]);
+                    newnameStudentUpdatetexte.setText(data[1]);
+            }
+        });
+
+        /**
+         * Clique sur le boutton updateStudentJButton
+         * Envoi de la requete Update vers la base de donnée
+         * On récupère tous les infomrations modifiés
+         * on effectue le changement
+         */
+        updateStudentJButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newname = newnameStudentUpdatetexte.getText();
+                String newlastname = newlastnameStudentUpdatetexte.getText();
+                String lastnameNameStudent = (String) comboBoxSelectStudentUpdate.getSelectedItem();
+
+                new DAOEleve(maconnexion).update(new Eleve(0,newlastname, newname), lastnameNameStudent);
+                ErrorMessage.setText("Suuces in updating student");
             }
         });
 
 
 
         /**
-         * Pour ajouter une personne
-         */
-
-        /**
-         * Pour modifier une personne
-         */
-
-
-        /**
          * Pour supprimer une personne
          */
+        StudentDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                /**
+                 * On récupére le nom et le prenom de l'élève selectionnée
+                 * On le sépare en 2 string distinct
+                 */
+                String lastnameNameStudent = (String) SelectStudentDelete.getSelectedItem();
+                String[] data = lastnameNameStudent.split(" ", 2);
+                new DAOEleve(maconnexion).delete(new Eleve(1, data[0], data[1]));
+                ErrorMessage.setText("Succes Deleting this Student");
+            }
+        });
 
         /**
          * JE SAIS PAS OU METTRE L'AJOUT DE PERSONNE DANS UNE CLASSE AINSI QUE LA SUPPREMSION D'UNE PERSONNE DANS LA CLASSE
