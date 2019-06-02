@@ -23,14 +23,14 @@ public abstract class Controleur <T> {
          * @param obj
          * @return boolean
          */
-        public abstract boolean delete(T obj);
+        public abstract boolean delete(T obj) throws ExceptionNotExisting;
 
         /**
          * Méthode de mise à jour
          * @param obj
          * @return boolean
          */
-        public abstract boolean update(T obj, String newName);
+        public abstract boolean update(T obj, String newName) throws ExceptionAlreadyExistant;
 
         /**
          * Méthode de recherche des informations
@@ -54,6 +54,8 @@ public abstract class Controleur <T> {
         public abstract T find (T obj);
 
         public abstract ArrayList<T> findAll();
+
+
 
 
     }

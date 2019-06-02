@@ -59,9 +59,14 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         return false;
     }
 
-    public boolean update(AnneeScolaire obj, String newName) {
+    public boolean update(AnneeScolaire obj, String newName) throws ExceptionAlreadyExistant {
         try {
             for ( int i=1; i< this.nombre_année_scolaire+1; i++) {
+
+                   if ( find(1,newName).getId() != 0 ) {
+                       throw new ExceptionAlreadyExistant();
+                   }
+
                 Statement stmt = this.connect.getConn().createStatement();
                 stmt.executeUpdate("Update AnneeScolaire SET nom_anneScolaire = '" + newName + "' Where id_annee_scolaire = " + i + " AND nom_anneScolaire = '" + obj.getYear() + "'");
             }
@@ -128,6 +133,25 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
     }
 
     public ArrayList<AnneeScolaire> findAll () {
+        ArrayList<AnneeScolaire> YearArrayList = new ArrayList<>();
+        try {
+            ResultSet result =  this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire "); //order by nom_anneScolaire DESC");
+            while (result.next()){
+                YearArrayList.add( new AnneeScolaire(
+                        result.getInt("id_annee_scolaire"),
+                        result.getString("nom_anneScolaire")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return YearArrayList;
+    }
+
+    public ArrayList<AnneeScolaire> findAll (int id2) {
+        id2 = 0;
         ArrayList<AnneeScolaire> YearArrayList = new ArrayList<>();
         try {
             ResultSet result =  this.connect.getConn().createStatement(

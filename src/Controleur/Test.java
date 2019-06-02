@@ -1,4 +1,5 @@
 package Controleur;
+import Vue.RootFenetre;
 import Vue.RootWindow;
 import Vue.Window;
 
@@ -8,7 +9,10 @@ public class Test {
            // Window window = new Window();
             // Udpatebdd upd = new Udpatebdd();
 
-            RootWindow rootWindow = new RootWindow();
-            rootWindow.setVisible(true);
+           // RootWindow rootWindow = new RootWindow();
+           // rootWindow.setVisible(true);
+
+            RootFenetre rootFenetre = new RootFenetre();
+            rootFenetre.setVisible(true);
         }
     }

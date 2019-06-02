@@ -27,11 +27,9 @@ public class InscriptionDAO extends Controleur<Inscription> {
                     if(result.first()) {
                         throw new ExceptionAlreadyExistant();
                     }
-
                 Statement stmt =  this.connect.getConn().createStatement();
                 stmt.executeUpdate("Insert INTO inscription VALUES (Null,'" + obj.getId_classe()+"', '" + obj.getId_personne() + "')");
-                System.out.println("The student is sign in a class ");
-
+                System.out.println("The student is sign in to the class ");
                 return true;
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -39,8 +37,21 @@ public class InscriptionDAO extends Controleur<Inscription> {
             }
         }
 
-        public boolean delete(Inscription obj) {
+        public boolean delete(Inscription obj) throws ExceptionNotExisting {
+            try {
+                ResultSet result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM inscription WHERE id_personne = " + obj.getId_personne() + " AND id_classe = " + obj.getId_classe());
+                if(result.first()) {
+                    Statement stmt =  this.connect.getConn().createStatement();
+                    stmt.executeUpdate("Delete from inscription where id_personne = " + result.getInt("id_personne"));
+                    return true;
+                } else
+                throw new ExceptionNotExisting();
+            } catch (SQLException e) {
+                e.printStackTrace();
                 return false;
+            }
         }
 
         public boolean update(Inscription obj, String newName) {

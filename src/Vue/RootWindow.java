@@ -227,7 +227,7 @@ public class RootWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String UpdateyearSelect = (String) SelectYearUpdate.getSelectedItem();
                  String NewNameyear = updateYearText.getText();
-                new AnneeScolaireDA0(maconnexion).update(new AnneeScolaireDA0(maconnexion).find(1, UpdateyearSelect),NewNameyear);
+                //new AnneeScolaireDA0(maconnexion).update(new AnneeScolaireDA0(maconnexion).find(1, UpdateyearSelect),NewNameyear);
                 ErrorMessage.setText("Succes updating level school in the database");
             }
         });
@@ -283,7 +283,7 @@ public class RootWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String deletelevel = (String) SelectlevelDelete.getSelectedItem();
-                new NiveauDAO(maconnexion).delete(new NiveauDAO(maconnexion).find(1,deletelevel));
+               // new NiveauDAO(maconnexion).delete(new NiveauDAO(maconnexion).find(1,deletelevel));
                 ErrorMessage.setText("Succes deleting level school in the database");
             }
         });
@@ -298,7 +298,7 @@ public class RootWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String updtateLevel = (String) SelctLevelUpdate.getSelectedItem();
                 String newnameLevel = SelectLevelUpdateTexte.getText();
-                new NiveauDAO(maconnexion).update(new NiveauDAO(maconnexion).find(1,updtateLevel), newnameLevel);
+                //new NiveauDAO(maconnexion).update(new NiveauDAO(maconnexion).find(1,updtateLevel), newnameLevel);
                 ErrorMessage.setText("Succes updating level school in the database");
             }
         });
@@ -403,7 +403,7 @@ public class RootWindow extends JFrame {
 
                 Classe deleteClasse = new Classe(0, SelectClass, idyearClasse, idLevelClasse);
 
-                new ClasseDA0(maconnexion).delete(deleteClasse);
+                //new ClasseDA0(maconnexion).delete(deleteClasse);
                 ErrorMessage.setText("Classe deleting from the database");
             }
         });
@@ -474,6 +474,8 @@ public class RootWindow extends JFrame {
                 new AnneeScolaireDA0(maconnexion).findAll().forEach(anneeScolaire -> {
                     comboBoxYearStudent.addItem(anneeScolaire.getYear());
                 });
+
+
             }
         });
 
@@ -519,12 +521,15 @@ public class RootWindow extends JFrame {
                 int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
 
                int idClasse = new ClasseDA0(maconnexion).find(new Classe(1,nameClasse, idyearClasse, idLevelClasse)).getId();
+               System.out.println(idClasse);
 
-              new DAOEleve(maconnexion).findAll(idClasse).forEach(eleve -> {
+                /**
+                 * Le beug se trouve ici , on arrive bien a récuperer l'id de la classe)
+                 */
+                new DAOEleve(maconnexion).findAll(idClasse).forEach(eleve -> {
                   comboBoxSelectStudentUpdate.addItem(eleve.getNom() + " " +eleve.getPrenom());
                   SelectStudentDelete.addItem(eleve.getNom() + " " + eleve.getPrenom());
               });
-
             }
         });
 
@@ -573,11 +578,11 @@ public class RootWindow extends JFrame {
         comboBoxSelectStudentUpdate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                comboBoxSelectStudentUpdate.getAccessibleContext();
-                String lastnameNameStudent = (String) comboBoxSelectStudentUpdate.getSelectedItem();
-                    String[] data = lastnameNameStudent.split(" ", 2);
-                    newlastnameStudentUpdatetexte.setText(data[0]);
-                    newnameStudentUpdatetexte.setText(data[1]);
+              //  comboBoxSelectStudentUpdate.getAccessibleContext();
+                //String lastnameNameStudent = (String) comboBoxSelectStudentUpdate.getSelectedItem();
+                  //  String[] data = lastnameNameStudent.split(" ", 2);
+                    //newlastnameStudentUpdatetexte.setText(data[0]);
+                    //newnameStudentUpdatetexte.setText(data[1]);
             }
         });
 
@@ -613,6 +618,7 @@ public class RootWindow extends JFrame {
                  */
                 String lastnameNameStudent = (String) SelectStudentDelete.getSelectedItem();
                 String[] data = lastnameNameStudent.split(" ", 2);
+                //int idStudent =  new DAOEleve(maconnexion).find(new Eleve(1, data[0], data[1])).getId();
                 new DAOEleve(maconnexion).delete(new Eleve(1, data[0], data[1]));
                 ErrorMessage.setText("Succes Deleting this Student");
             }

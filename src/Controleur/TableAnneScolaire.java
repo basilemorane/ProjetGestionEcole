@@ -28,7 +28,7 @@ public class TableAnneScolaire extends AbstractTableModel {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return year.get(rowIndex);
+            return year.get(rowIndex).getYear();
         }
 
         @Override

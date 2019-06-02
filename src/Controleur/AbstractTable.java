@@ -8,10 +8,9 @@ public  class AbstractTable extends AbstractTableModel {
 
    }
 
-
     @Override
     public int getColumnCount() {
-        return 4;
+        return 1;
     }
 
     @Override
@@ -26,6 +25,6 @@ public  class AbstractTable extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        return "ez";
+        return "";
     }
 }

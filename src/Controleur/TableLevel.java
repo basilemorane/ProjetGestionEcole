@@ -9,12 +9,14 @@ import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 
 public class TableLevel extends AbstractTableModel {
-    private Controleur<Niveau> test;
     private ArrayList<Niveau> level;
 
-    public  TableLevel(Connexion conn){
-        this.test = new NiveauDAO(conn);
-        this.level = test.findAll();
+    public  TableLevel(){
+        this.level = new ArrayList<>();
+    }
+
+    public TableLevel (ArrayList<Niveau> level){
+        this.level = level;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class TableLevel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return level.get(rowIndex);
+        return level.get(rowIndex).getNom();
     }
 
     @Override
