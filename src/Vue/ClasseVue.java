@@ -150,7 +150,7 @@ public class ClasseVue extends JFrame implements ActionListener, ItemListener {
              * On se connecte à la base de données
              */
 
-            if (source == Validate) {
+        /*    if (source == Validate) {
                 String requete = lookingFor.getText();
                 Result.removeAll();
                 if (requete == "") {
@@ -165,7 +165,7 @@ public class ClasseVue extends JFrame implements ActionListener, ItemListener {
                         }
                     }
                 }
-            }
+            }*/
 
         }
 

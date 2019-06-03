@@ -236,14 +236,14 @@ public class DAOEleve extends Controleur<Eleve> {
         return ArrayList;
     }
 
-    public  ArrayList<Eleve> findAllAbsent () {
+    public  ArrayList<Eleve> findAllAbsent (int idyear) {
         ArrayList<Eleve> ArrayList = new ArrayList<>();
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne LEFT JOIN inscription ON personne.id_personne = inscription.id_personne WHERE inscription.id_classe IS NULL AND personne.type_personne = 0" );
-            while (result.next()) {
-                    ArrayList.add(new Eleve(
+                   ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `personne` WHERE id_personne NOT IN (SELECT id_personne FROM `inscription` INNER JOIN classe ON inscription.id_classe = classe.id_classe WHERE classe.id_annee_scolaire = '" + idyear + "') AND type_personne = '0'" );
+                    while (result.next()) {
+               ArrayList.add(new Eleve(
                             result.getInt("id_personne"),
                             result.getString("nom_personne"),
                             result.getString("prenom_personne")
@@ -255,3 +255,8 @@ public class DAOEleve extends Controleur<Eleve> {
         return ArrayList;
     }
 }
+
+/*
+SELECT DISTINCT  personne.id_personne FROM `personne` LEFT JOIN inscription ON personne.id_personne NOT IN (
+   SELECT inscription.id_personne FROM inscription LEFT JOIN classe ON inscription.id_classe IN ( SELECT id_classe FROM classe WHERE id_annee_scolaire = '3')) AND type_personne = 0
+ */

@@ -3,7 +3,6 @@ package Vue;
 import Controleur.Connexion;
 import Controleur.ControleurClasse.*;
 import Modele.*;
-import javafx.scene.control.ComboBox;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -65,6 +64,12 @@ public class RootFenetre extends JFrame {
     private JButton buttonAddStudentToClasse;
     private JTable tableClasse;
     private JTable tableLevelSchool;
+    private JComboBox comboBoxSelectDispline;
+    private JTable tableTeacherPresent;
+    private JTable tableTeacherAbsent;
+    private JPanel GestionDiscipline;
+    private JTable tableDisciplinePresent;
+    private JTable tableDisciplineAbsent;
 
     public Connexion maconnexion ;
 
@@ -97,9 +102,7 @@ public class RootFenetre extends JFrame {
                          */
 
                         refillComboBoxYear();
-
                         refillTableSchoolYear();
-
                         refillComboBoxLevel();
 
                     } catch (ClassNotFoundException evt) {
@@ -121,6 +124,13 @@ public class RootFenetre extends JFrame {
          * Les méthodes pour gérer les différentes comboBox du programme
          *
          */
+       /* comboBoxSelectYear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refillComboBoxLevel();
+            }
+        });*/
+
         comboBoxSelectLevel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -133,8 +143,19 @@ public class RootFenetre extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 refillComboBoxStudent();
+                refillComboBoxDiscipline();
+
+                refillTableStudentPresent(FindIdClasseForStudent());
+                refillTableStudentAbsent();
                  }
             });
+
+        comboBoxSelectDispline.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refillTableDiscipline ();
+            }
+        });
 
         /**
          * Les méthodes de gestions pour les Années Scolaires
@@ -148,7 +169,6 @@ public class RootFenetre extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 textFieldAddYearSchoo.setText((String) comboBoxSelectYear.getSelectedItem());
-
                 refillTableSchoolYear();
 
             }
@@ -264,6 +284,7 @@ public class RootFenetre extends JFrame {
                 refillTableStudentPresent(FindIdClasseForStudent());
                 refillTableStudentAbsent();
                 refillTableClasse();
+                refillTableDiscipline ();
             }
         });
 
@@ -393,6 +414,7 @@ public class RootFenetre extends JFrame {
                 }
             }
         });
+
     }
 
 
@@ -450,6 +472,14 @@ public class RootFenetre extends JFrame {
         });
     }
 
+    public void refillComboBoxDiscipline (){
+        int idClasse = FindIdClasseForStudent();
+        new DisciplineDAO(maconnexion).findAll(idClasse).forEach(discipline -> {
+            System.out.println(discipline.getNom_classe());
+            comboBoxSelectDispline.addItem(discipline.getNom_classe());
+        });
+    }
+
     public void refillSelectNewYearClasse (){
         SelectNewYearClasse.removeAllItems();
         new AnneeScolaireDA0(maconnexion).findAll().forEach(anneeScolaire -> { SelectNewYearClasse.addItem(anneeScolaire.getYear());
@@ -481,7 +511,9 @@ public class RootFenetre extends JFrame {
     }
 
     public void refillTableStudentAbsent () {
-        tableStudentAbsent.setModel(new TableStudent(new DAOEleve(maconnexion).findAllAbsent()));
+        String yearClasse = (String) comboBoxSelectYear.getSelectedItem();
+        int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
+        tableStudentAbsent.setModel(new TableStudent(new DAOEleve(maconnexion).findAllAbsent(idyearClasse)));
     }
 
     public void refillTableClasse () {
@@ -497,6 +529,11 @@ public class RootFenetre extends JFrame {
         tableLevelSchool.setModel(new TableLevel(new NiveauDAO(maconnexion).findAll()));
     }
 
+    public void refillTableDiscipline () {
+        int idClasse = FindIdClasseForStudent();
+        tableDisciplinePresent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll(idClasse)));
+    }
+
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
@@ -505,5 +542,6 @@ public class RootFenetre extends JFrame {
         tableStudentAbsent = new JTable(new TableStudent());
         tableClasse = new JTable(new TableClasse());
         tableLevelSchool = new JTable(new TableLevel());
+        tableDisciplinePresent = new JTable(new TableDiscipline());
     }
 }

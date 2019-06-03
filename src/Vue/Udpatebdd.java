@@ -150,7 +150,7 @@ public class Udpatebdd extends JFrame implements ActionListener, ItemListener {
          * On se connecte à la base de données
          */
 
-        if (source == Validate){
+      /*  if (source == Validate){
                String requete = lookingFor.getText();
                Result.removeAll();
                if (requete == "") {
@@ -159,13 +159,13 @@ public class Udpatebdd extends JFrame implements ActionListener, ItemListener {
                } else {
                    Controleur<Eleve> Eleve = new DAOEleve(maconnexion);
                    for (int i = 0; i<10; i++){
-                       Eleve student = Eleve.recherch(i, requete);
+                     //  Eleve student = Eleve.recherch(i, requete);
                        if (student.getId() != 0){
                            Result.add(student.getNom() + " " + student.getPrenom());
                        }
                    }
                }
-        }
+        }*/
 
     }
 

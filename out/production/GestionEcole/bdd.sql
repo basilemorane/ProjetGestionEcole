@@ -116,3 +116,7 @@ VALUES (NULL, '2', '1'),
 (NULL, '3', '9'),
 (NULL, '4', '10'),
 (NULL, '1', '11');
+
+INSERT INTO `Enseignement` ( id_enseignement, id_classe, id_discipline, id_personne)
+VALUES (NULL, '1', '1', '3'),
+(NULL, '1', '2', '4');

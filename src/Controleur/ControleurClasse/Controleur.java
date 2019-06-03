@@ -49,8 +49,6 @@ public abstract class Controleur <T> {
 
         public abstract T find (int id, int id1, int id2);
 
-        public abstract T recherch (int id, String name);
-
         public abstract T find (T obj);
 
         public abstract ArrayList<T> findAll();
