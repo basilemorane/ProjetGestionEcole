@@ -146,13 +146,31 @@ public class DisciplineDAO extends Controleur<Discipline>{
     }
 
     public ArrayList<Discipline> findAll (int id2) {
-        id2 = 0;
         ArrayList<Discipline> DisciplineArrayList = new ArrayList<>();
         try {
             ResultSet result =  this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                   //  ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `discipline` INNER JOIN enseignement ON discipline.id_discipline = enseignement.id_discipline WHERE enseignement.id_classe = " + id2 );
-            ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT discipline.id_discipline, discipline.nom_discipline FROM `discipline` INNER JOIN enseignement ON discipline.id_discipline = enseignement.id_discipline WHERE enseignement.id_classe = " + id2 );
+            ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * from discipline WHERE id_discipline IN (SELECT enseignement.id_discipline FROM `enseignement` INNER JOIN classe ON enseignement.id_classe = classe.id_classe WHERE classe.id_annee_scolaire = '" + id2 + "')");
+            while (result.next()){
+                DisciplineArrayList.add( new Discipline(
+                        result.getInt("id_discipline"),
+                        result.getString("nom_discipline")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return DisciplineArrayList;
+    }
+
+    public ArrayList<Discipline> findAllAbsent (int id2, int idLevel) {
+        ArrayList<Discipline> DisciplineArrayList = new ArrayList<>();
+        try {
+            ResultSet result =  this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    //  ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `discipline` INNER JOIN enseignement ON discipline.id_discipline = enseignement.id_discipline WHERE enseignement.id_classe = " + id2 );
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * from discipline WHERE id_discipline NOT IN (SELECT enseignement.id_discipline FROM `enseignement` INNER JOIN classe ON enseignement.id_classe = classe.id_classe WHERE classe.id_annee_scolaire = '" + id2 + "' AND classe.id_niveau = '" + idLevel + "')");
             while (result.next()){
                 DisciplineArrayList.add( new Discipline(
                         result.getInt("id_discipline"),
@@ -165,3 +183,7 @@ public class DisciplineDAO extends Controleur<Discipline>{
         return DisciplineArrayList;
     }
 }
+
+/*
+SELECT * from discipline WHERE id_discipline IN (SELECT enseignement.id_discipline FROM `enseignement` INNER JOIN classe ON enseignement.id_classe = classe.id_classe WHERE classe.id_niveau = '1' AND classe.id_annee_scolaire = '3')
+ */

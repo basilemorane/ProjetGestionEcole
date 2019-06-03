@@ -144,6 +144,7 @@ public class RootFenetre extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 refillComboBoxStudent();
                 refillComboBoxDiscipline();
+                refillTableDisplineNotPresent ();
 
                 refillTableStudentPresent(FindIdClasseForStudent());
                 refillTableStudentAbsent();
@@ -285,6 +286,7 @@ public class RootFenetre extends JFrame {
                 refillTableStudentAbsent();
                 refillTableClasse();
                 refillTableDiscipline ();
+                refillTableDisplineNotPresent ();
             }
         });
 
@@ -530,8 +532,18 @@ public class RootFenetre extends JFrame {
     }
 
     public void refillTableDiscipline () {
-        int idClasse = FindIdClasseForStudent();
-        tableDisciplinePresent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll(idClasse)));
+        String year = (String) comboBoxSelectYear.getSelectedItem();
+        int idyear = new AnneeScolaireDA0(maconnexion).find(1, year).getId();
+        tableDisciplinePresent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll(idyear)));
+    }
+
+    public void refillTableDisplineNotPresent (){
+        String year = (String) comboBoxSelectYear.getSelectedItem();
+        String level = (String) comboBoxSelectLevel.getSelectedItem();
+        int idyear = new AnneeScolaireDA0(maconnexion).find(1, year).getId();
+        int idLevel = new NiveauDAO(maconnexion).find(1, level).getId();
+
+        tableDisciplineAbsent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAllAbsent(idyear, idLevel)));
     }
 
 
@@ -543,5 +555,6 @@ public class RootFenetre extends JFrame {
         tableClasse = new JTable(new TableClasse());
         tableLevelSchool = new JTable(new TableLevel());
         tableDisciplinePresent = new JTable(new TableDiscipline());
+        tableDisciplineAbsent = new JTable(new TableDiscipline());
     }
 }
