@@ -20,7 +20,7 @@ public class RootFenetre extends JFrame {
     private JTextField nameBddtext;
     private JButton connectJButton;
     private JLabel ErrorConnect;
-    private JTabbedPane SchoolTabbed;
+    private JTabbedPane CLasse;
     private JPanel JpanelMessage;
     private JPanel JpanelSelect;
     private JLabel JLabelMessage;
@@ -76,6 +76,20 @@ public class RootFenetre extends JFrame {
     private JButton buttonUpdateDiscpline;
     private JButton buttonDeleteDiscipline;
     private JTable tableDisplineSchool;
+    private JPanel Teacher;
+    private JPanel Student;
+    private JTable tableStudentSchool;
+    private JButton buttonStudentUpgrade;
+    private JButton buttonStudentDelete;
+    private JTextField textFieldStudentLastName;
+    private JButton buttonCreateStudent;
+    private JTextField textFieldStudentName;
+    private JTable tableTeacherSchool;
+    private JTextField textFieldteacherLastname;
+    private JTextField textFieldTeachername;
+    private JButton buttonCreateteacher;
+    private JButton buttonUpdatingTeacher;
+    private JButton buttonDeleteTeacher;
 
     public Connexion maconnexion ;
 
@@ -110,6 +124,9 @@ public class RootFenetre extends JFrame {
                         refillComboBoxYear();
                         refillTableSchoolYear();
                         refillComboBoxLevel();
+
+                        refillTableStudentSchool ();
+                        refillTableTeacherSchool();
 
                     } catch (ClassNotFoundException evt) {
                         System.out.println(evt);
@@ -291,7 +308,7 @@ public class RootFenetre extends JFrame {
                 refillTableStudentPresent(FindIdClasseForStudent());
                 refillTableStudentAbsent();
                 refillTableClasse();
-                refillTableDiscipline ();
+                refillTableDiscipline();
                 refillTableDisplineNotPresent ();
             }
         });
@@ -431,7 +448,7 @@ public class RootFenetre extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                refillTableDisciplineSchool ();
+                refillTableDisciplineSchool();
             }
         });
 
@@ -442,10 +459,114 @@ public class RootFenetre extends JFrame {
                 try {
                     new DisciplineDAO(maconnexion).create(new Discipline(1, newDiscipline));
                     JLabelMessage.setText("Succes in creating this discipline in the databasez");
-                    refillTableDisciplineSchool ();
+                    refillTableDisciplineSchool();
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("Error in creating this discipline in the database");
                 }
+            }
+        });
+
+        /**
+         * STUDENT
+         */
+
+        Student.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                refillTableStudentSchool ();
+            }
+        });
+
+        buttonCreateStudent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newLastname = textFieldStudentLastName.getText();
+                String newname = textFieldStudentName.getText();
+                try {
+                    new DAOEleve(maconnexion).create(new Eleve(1, newLastname, newname));
+                    JLabelMessage.setText("Succes adding student in the database");
+                    refillTableStudentSchool ();
+                } catch (ExceptionAlreadyExistant evt){
+                    JLabelMessage.setText("Error in adding student in the database");
+                }
+            }
+        });
+
+        buttonStudentUpgrade.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String lastnamename = (String) tableStudentSchool.getValueAt(tableStudentSchool.getSelectedRow(), tableStudentSchool.getSelectedColumn());
+                new DAOEleve(maconnexion).update(new Eleve(1, textFieldStudentLastName.getText(), textFieldStudentName.getText()),lastnamename );
+                JLabelMessage.setText("Succes in updating the student");
+                refillTableStudentSchool();
+            }
+        });
+
+        buttonStudentDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String lastnamename = (String) tableStudentSchool.getValueAt(tableStudentSchool.getSelectedRow(), tableStudentSchool.getSelectedColumn());
+                String[] data = lastnamename.split(" ", 2);
+                new DAOEleve(maconnexion).delete(new Eleve(1, data[0], data[1]));
+                JLabelMessage.setText("Succes deleting student");
+                refillTableStudentSchool();
+            }
+        });
+
+        /**
+         * Gestion des clic qur le tableau
+         */
+        tableStudentSchool.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                String lastnamename = (String) tableStudentSchool.getValueAt(tableStudentSchool.getSelectedRow(), tableStudentSchool.getSelectedColumn());
+                String[] data = lastnamename.split(" ", 2);
+                textFieldStudentLastName.setText(data[0]);
+                textFieldStudentName.setText(data[1]);
+            }
+        });
+
+        /**
+         * TEACHER
+         */
+
+
+        buttonCreateteacher.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newLastname = textFieldteacherLastname.getText();
+                String newname = textFieldTeachername.getText();
+                try {
+                    new ProfesseurDAO(maconnexion).create(new Professeur(1, newLastname, newname));
+                    JLabelMessage.setText("Succes adding professeur in the database");
+                    refillTableTeacherSchool();
+                } catch (ExceptionAlreadyExistant evt){
+                    JLabelMessage.setText("Error in adding professeur in the database");
+                }
+            }
+        });
+
+        buttonUpdatingTeacher.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String lastnamename = (String) tableTeacherSchool.getValueAt(tableTeacherSchool.getSelectedRow(), tableTeacherSchool.getSelectedColumn());
+                new ProfesseurDAO(maconnexion).update(new Professeur(1, textFieldteacherLastname.getText(), textFieldTeachername.getText()),lastnamename );
+                JLabelMessage.setText("Succes in updating the teacher");
+                refillTableTeacherSchool();
+            }
+        });
+
+
+        buttonDeleteTeacher.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String lastnamename = (String) tableTeacherSchool.getValueAt(tableTeacherSchool.getSelectedRow(), tableTeacherSchool.getSelectedColumn());
+                String[] data = lastnamename.split(" ", 2);
+                new ProfesseurDAO(maconnexion).delete(new Professeur(1, data[0], data[1]));
+                JLabelMessage.setText("Succes deleting teacher");
+                refillTableTeacherSchool();
             }
         });
     }
@@ -581,6 +702,15 @@ public class RootFenetre extends JFrame {
         tableDisplineSchool.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll()));
     }
 
+    public void refillTableStudentSchool (){
+        tableStudentSchool.setModel(new TableStudent(new DAOEleve(maconnexion).findAllStudent()));
+    }
+
+    public void refillTableTeacherSchool() {
+        tableTeacherSchool.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).findAllTeacher()));
+    }
+
+
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
@@ -592,5 +722,7 @@ public class RootFenetre extends JFrame {
         tableDisciplinePresent = new JTable(new TableDiscipline());
         tableDisciplineAbsent = new JTable(new TableDiscipline());
         tableDisplineSchool = new JTable(new TableDiscipline());
+        tableStudentSchool = new JTable(new TableStudent());
+        tableTeacherSchool = new JTable(new TableTeacher());
     }
 }

@@ -254,6 +254,26 @@ public class DAOEleve extends Controleur<Eleve> {
         }
         return ArrayList;
     }
+
+    public ArrayList<Eleve> findAllStudent () {
+        ArrayList<Eleve> ArrayList = new ArrayList<>();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    //ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT DISCTINCT * FROM personne INNER JOIN inscription ON personne.id_personne = inscription.id_personne AND inscription.id_classe = " + id2);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne where type_personne = '0' " );
+            while (result.next()) {
+                ArrayList.add(new Eleve(
+                        result.getInt("id_personne"),
+                        result.getString("nom_personne"),
+                        result.getString("prenom_personne")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ArrayList;
+    }
 }
 
 /*

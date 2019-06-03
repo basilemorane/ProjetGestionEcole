@@ -35,4 +35,5 @@ public class TableStudent extends AbstractTableModel {
     public String getColumnName(int column) {
         return "Student";
     }
+
 }
