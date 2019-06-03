@@ -24,7 +24,7 @@ public class DisciplineDAO extends Controleur<Discipline>{
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Discipline WHERE Discipline ='" + obj.getNom_classe() +"'");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Discipline WHERE nom_discipline ='" + obj.getNom_classe() +"'");
             if(result.first()) {
                 throw new ExceptionAlreadyExistant();
             }
@@ -132,7 +132,7 @@ public class DisciplineDAO extends Controleur<Discipline>{
         try {
             ResultSet result =  this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Discipline "); //order by nom_anneScolaire DESC");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Discipline ");
             while (result.next()){
                 YearArrayList.add( new Discipline(
                         result.getInt("id_discipline"),

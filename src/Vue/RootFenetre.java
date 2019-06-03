@@ -70,6 +70,12 @@ public class RootFenetre extends JFrame {
     private JPanel GestionDiscipline;
     private JTable tableDisciplinePresent;
     private JTable tableDisciplineAbsent;
+    private JPanel Discipline;
+    private JTextField textFieldNewDiscipline;
+    private JButton buttonCreateDiscipline;
+    private JButton buttonUpdateDiscpline;
+    private JButton buttonDeleteDiscipline;
+    private JTable tableDisplineSchool;
 
     public Connexion maconnexion ;
 
@@ -417,6 +423,31 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * GESTION DISCIPLINE
+         */
+
+        Discipline.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                refillTableDisciplineSchool ();
+            }
+        });
+
+        buttonCreateDiscipline.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newDiscipline = textFieldNewDiscipline.getText();
+                try {
+                    new DisciplineDAO(maconnexion).create(new Discipline(1, newDiscipline));
+                    JLabelMessage.setText("Succes in creating this discipline in the databasez");
+                    refillTableDisciplineSchool ();
+                } catch (ExceptionAlreadyExistant evt){
+                    JLabelMessage.setText("Error in creating this discipline in the database");
+                }
+            }
+        });
     }
 
 
@@ -546,6 +577,10 @@ public class RootFenetre extends JFrame {
         tableDisciplineAbsent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAllAbsent(idyear, idLevel)));
     }
 
+    public void refillTableDisciplineSchool () {
+        tableDisplineSchool.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll()));
+    }
+
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
@@ -556,5 +591,6 @@ public class RootFenetre extends JFrame {
         tableLevelSchool = new JTable(new TableLevel());
         tableDisciplinePresent = new JTable(new TableDiscipline());
         tableDisciplineAbsent = new JTable(new TableDiscipline());
+        tableDisplineSchool = new JTable(new TableDiscipline());
     }
 }
