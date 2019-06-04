@@ -180,6 +180,8 @@ public class RootFenetre extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 refillTableDiscipline ();
+                refillTableDisplineNotPresent();
+                refillTableTeacherAbsent();
                 refillTableTeacherPresent();
             }
         });
@@ -323,10 +325,13 @@ public class RootFenetre extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String yearClasse = (String) SelectNewYearClasse.getSelectedItem();
+                System.out.println(yearClasse);
                 String levelClasse = (String) SelectNewLevelClasse.getSelectedItem();
-
+                System.out.println(levelClasse);
                 int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
                 int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
+                System.out.println(idyearClasse);
+                System.out.println(idLevelClasse);
                 String newNameClasse = textFieldClasseName.getText();
 
                 try {
@@ -605,6 +610,7 @@ public class RootFenetre extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 refillTableTeacherPresent();
+                refillTableTeacherAbsent();
             }
         });
     }
@@ -665,6 +671,7 @@ public class RootFenetre extends JFrame {
     }
 
     public void refillComboBoxDiscipline (){
+        comboBoxSelectDispline.removeAllItems();
         int idClasse = FindIdClasseForStudent();
         System.out.println("Id CLASSE :: "+ idClasse);
         new DisciplineDAO(maconnexion).findAll(idClasse).forEach(discipline -> {
@@ -723,17 +730,19 @@ public class RootFenetre extends JFrame {
     }
 
     public void refillTableDiscipline () {
-        String year = (String) comboBoxSelectYear.getSelectedItem();
-        int idyear = new AnneeScolaireDA0(maconnexion).find(1, year).getId();
-        tableDisciplinePresent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll(idyear)));
+
+        int idClasse = FindIdClasseForStudent();
+
+        tableDisciplinePresent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll(idClasse)));
     }
 
     public void refillTableDisplineNotPresent (){
         String year = (String) comboBoxSelectYear.getSelectedItem();
         String level = (String) comboBoxSelectLevel.getSelectedItem();
         int idyear = new AnneeScolaireDA0(maconnexion).find(1, year).getId();
+        System.out.println(idyear);
         int idLevel = new NiveauDAO(maconnexion).find(1, level).getId();
-
+        System.out.println(idLevel);
         tableDisciplineAbsent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAllAbsent(idyear, idLevel)));
     }
 
@@ -750,8 +759,13 @@ public class RootFenetre extends JFrame {
     }
 
     public void refillTableTeacherPresent () {
+        int idDiscipline = new DisciplineDAO(maconnexion).find(1, (String) comboBoxSelectDispline.getSelectedItem()).getId_discipline();
+        tableTeacherPresent.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).FindTeacher(FindIdClasseForStudent(), idDiscipline)));
+    }
 
-        tableTeacherPresent.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).findAll(FindIdClasseForStudent(), (String) comboBoxSelectDispline.getSelectedItem())));
+    public void refillTableTeacherAbsent () {
+        tableTeacherAbsent.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).findAllAbsent(FindIdClasseForStudent())));
+
     }
 
 
@@ -759,16 +773,20 @@ public class RootFenetre extends JFrame {
     private void createUIComponents() {
         // TODO: place custom component creation code here
         tableSchoolYear = new JTable(new TableAnneScolaire());
+
         tableStudentPresent = new JTable(new TableStudent());
         tableStudentAbsent = new JTable(new TableStudent());
+
         tableClasse = new JTable(new TableClasse());
         tableLevelSchool = new JTable(new TableLevel());
         tableDisciplinePresent = new JTable(new TableDiscipline());
         tableDisciplineAbsent = new JTable(new TableDiscipline());
         tableDisplineSchool = new JTable(new TableDiscipline());
+
         tableStudentSchool = new JTable(new TableStudent());
         tableTeacherSchool = new JTable(new TableTeacher());
 
         tableTeacherPresent = new JTable(new TableTeacher());
+        tableTeacherAbsent = new JTable(new TableTeacher());
     }
 }

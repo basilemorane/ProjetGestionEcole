@@ -208,6 +208,44 @@ public class ProfesseurDAO extends Controleur<Professeur> {
             return ArrayList;
         }
 
+        public ArrayList<Professeur> FindTeacher (int idClasse, int idDiscipline){
+            ArrayList<Professeur> ArrayList = new ArrayList<>();
+            try {
+                ResultSet result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT personne.id_personne, personne.nom_personne, personne.prenom_personne FROM personne INNER JOIN `enseignement`ON personne.id_personne = enseignement.id_personne where enseignement.id_classe = '" + idClasse + "' AND enseignement.id_discipline ='"+ idDiscipline +"'");
+                while (result.next()) {
+                    ArrayList.add(new Professeur(
+                            result.getInt("id_personne"),
+                            result.getString("nom_personne"),
+                            result.getString("prenom_personne")
+                    ));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return ArrayList;
+        }
+
+    public ArrayList<Professeur> findAllAbsent (int id2) {
+        ArrayList<Professeur> ArrayList = new ArrayList<>();
+            try {
+                ResultSet result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `personne` WHERE id_personne NOT IN (SELECT id_personne FROM `enseignement` INNER JOIN classe ON enseignement.id_classe = classe.id_classe WHERE classe.id_annee_scolaire = '" + id2 + "') AND type_personne = '1'" );
+                while (result.next()) {
+                    ArrayList.add(new Professeur(
+                            result.getInt("id_personne"),
+                            result.getString("nom_personne"),
+                            result.getString("prenom_personne")
+                    ));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return ArrayList;
+        }
+
         public ArrayList<Professeur> findAll () {
             ArrayList<Professeur> ArrayList = new ArrayList<>();
             try {
