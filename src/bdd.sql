@@ -80,12 +80,12 @@ INSERT INTO `AnneeScolaire` (`id_annee_scolaire`, `nom_anneScolaire`)
 VALUES (NULL, '2016-2017'),(NULL, '2017-2018'),(NULL, '2018-2019');
 
 INSERT INTO `Niveau` (`id_niveau`, `nom_niveau`)
-VALUES (NULL, 'ING1'),(NULL, 'ING2'),(NULL, 'ING3'),(NULL, 'ING4'),(NULL, 'ING5');
+VALUES (NULL, 'ING1'),(NULL, 'ING2');
 
 INSERT INTO `Classe` (`id_classe`,`nom_classe`,`id_ecole`, `id_niveau`, id_annee_scolaire)
-VALUES (NULL, 'TD01', '1', '1', '3'), (NULL, 'TD02', '1', '1', '3'), (NULL, 'TD03', '1', '1', '3'),(NULL, 'TD04', '1', '1', '3'),
-(NULL, 'TD01', '1', '2', '3'), (NULL, 'TD02', '1', '2', '3'), (NULL, 'TD03', '1', '2', '3'),(NULL, 'TD04', '1', '2', '3'),
-(NULL, 'TD01', '1', '3', '3'), (NULL, 'TD02', '1', '3', '3'), (NULL, 'TD03', '1', '3', '3'),(NULL, 'TD04', '1', '3', '3');
+VALUES (NULL, 'TD01', '1', '1', '3'), (NULL, 'TD02', '1', '1', '3'), (NULL, 'TD01', '1', '2', '3'),(NULL, 'TD02', '1', '2', '3'),
+(NULL, 'TD01', '1', '1', '2'), (NULL, 'TD02', '1', '1', '2'), (NULL, 'TD01', '1', '2', '2'),(NULL, 'TD02', '1', '2', '2'),
+(NULL, 'TD01', '1', '1', '1'), (NULL, 'TD02', '1', '1', '1');
 
 INSERT INTO `Discipline` (`id_discipline`, `nom_discipline`)
 VALUES (NULL, 'Traitement du signal 1'), (NULL, 'Analyse de Fourier'), (NULL, 'Anglais'), (NULL, 'POO JAVA'),(NULL, 'Droit du travail');
@@ -106,16 +106,24 @@ VALUES (NULL, 'Eleve', '1', '0'),
 (NULL, 'Eleve', '11', '0');
 
 INSERT INTO `inscription` (`id_inscription`, `id_classe`, `id_personne`)
-VALUES (NULL, '2', '1'),
-(NULL, '1', '1'),
-(NULL, '2', '2'),
+VALUES (NULL, '1', '1'),
+(NULL, '1', '2'),
+(NULL, '1', '5'),
+(NULL, '2', '6'),
+(NULL, '2', '7'),
+(NULL, '2', '8'),
+(NULL, '1', '9'),
+(NULL, '2', '10'),
+(NULL, '1', '11'),
+(NULL, '4', '1'),
+(NULL, '3', '2'),
 (NULL, '3', '5'),
 (NULL, '4', '6'),
-(NULL, '1', '7'),
-(NULL, '2', '8'),
-(NULL, '3', '9'),
+(NULL, '3', '7'),
+(NULL, '3', '8'),
+(NULL, '4', '9'),
 (NULL, '4', '10'),
-(NULL, '1', '11');
+(NULL, '4', '11');
 
 INSERT INTO `Enseignement` ( id_enseignement, id_classe, id_discipline, id_personne)
 VALUES (NULL, '1', '1', '3'),

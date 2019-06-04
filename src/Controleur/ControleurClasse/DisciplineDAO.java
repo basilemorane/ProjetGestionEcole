@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+
 import Controleur.Connexion;
 
 public class DisciplineDAO extends Controleur<Discipline>{
@@ -37,6 +39,22 @@ public class DisciplineDAO extends Controleur<Discipline>{
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean addDisciplinetoPromo (Discipline obj, int idyear, int idlevel) {
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT id_classe FROM `classe` WHERE `id_annee_scolaire` ='"+ idyear + "' AND `id_niveau` = '"+ idlevel + "'");
+                    while (result.next()) {
+                        Statement stmt =  this.connect.getConn().createStatement();
+                        stmt.executeUpdate("Insert INTO Enseignement VALUES (Null,'" +result.getInt("id_classe") + "', '" + obj.getId_discipline() +"', '3')");
+                    }
+        } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+        }
+        return true;
     }
 
     public boolean delete(Discipline obj) {
@@ -107,7 +125,7 @@ public class DisciplineDAO extends Controleur<Discipline>{
             for (int i=0; i< nombre_année_scolaire+1; i++) {
                 ResultSet result = this.connect.getConn().createStatement(
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE id_annee_scolaire = " + i + " AND nom_anneScolaire ='" + name + "'");
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM discipline WHERE id_discipline = " + i + " AND nom_discipline ='" + name + "'");
                 if (result.first())
                     year = new Discipline(
                             result.getInt("id_discipline"),
@@ -151,7 +169,7 @@ public class DisciplineDAO extends Controleur<Discipline>{
             ResultSet result =  this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                   //  ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `discipline` INNER JOIN enseignement ON discipline.id_discipline = enseignement.id_discipline WHERE enseignement.id_classe = " + id2 );
-            ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * from discipline WHERE id_discipline IN (SELECT enseignement.id_discipline FROM `enseignement` INNER JOIN classe ON enseignement.id_classe = classe.id_classe WHERE classe.id_annee_scolaire = '" + id2 + "')");
+            ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `discipline` INNER JOIN enseignement ON discipline.id_discipline = enseignement.id_discipline Where enseignement.id_classe = '" + id2 + "'");
             while (result.next()){
                 DisciplineArrayList.add( new Discipline(
                         result.getInt("id_discipline"),

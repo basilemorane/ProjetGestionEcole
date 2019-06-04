@@ -184,18 +184,23 @@ public class ProfesseurDAO extends Controleur<Professeur> {
             }
             return eleve;
         }
-        public ArrayList<Professeur> findAll (int id2) {
+        public ArrayList<Professeur> findAll (int id2, String id3) {
             ArrayList<Professeur> ArrayList = new ArrayList<>();
             try {
                 ResultSet result = this.connect.getConn().createStatement(
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne INNER JOIN inscription On inscription.id_classe = "+ id2 + " AND personne.id_personne = inscription.id_personne");
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT id_personne FROM `enseignement` INNER JOIN discipline ON discipline.id_discipline = enseignement.id_discipline Where enseignement.id_classe = '" + id2 + "' AND discipline.nom_discipline = '" + id3 + "'");
                 while (result.next()) {
-                    ArrayList.add(new Professeur(
-                            result.getInt("id_personne"),
-                            result.getString("nom_personne"),
-                            result.getString("prenom_personne")
-                    ));
+                    ResultSet result2 = this.connect.getConn().createStatement(
+                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY).executeQuery("Select * from personne where id_personne = " + result.getInt("id_personne"));
+                    if (result2.first()) {
+                        ArrayList.add(new Professeur(
+                                result2.getInt("id_personne"),
+                                result2.getString("nom_personne"),
+                                result2.getString("prenom_personne")
+                        ));
+                    }
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

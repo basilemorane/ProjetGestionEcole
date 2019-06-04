@@ -20,7 +20,7 @@ public class RootFenetre extends JFrame {
     private JTextField nameBddtext;
     private JButton connectJButton;
     private JLabel ErrorConnect;
-    private JTabbedPane CLasse;
+    private JTabbedPane JPanedSchool;
     private JPanel JpanelMessage;
     private JPanel JpanelSelect;
     private JLabel JLabelMessage;
@@ -90,6 +90,8 @@ public class RootFenetre extends JFrame {
     private JButton buttonCreateteacher;
     private JButton buttonUpdatingTeacher;
     private JButton buttonDeleteTeacher;
+    private JButton removeButton;
+    private JButton newButtonDispiline;
 
     public Connexion maconnexion ;
 
@@ -178,6 +180,7 @@ public class RootFenetre extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 refillTableDiscipline ();
+                refillTableTeacherPresent();
             }
         });
 
@@ -305,6 +308,7 @@ public class RootFenetre extends JFrame {
                 super.mouseClicked(e);
                 refillSelectNewLevelClasse();
                 refillSelectNewYearClasse();
+
                 refillTableStudentPresent(FindIdClasseForStudent());
                 refillTableStudentAbsent();
                 refillTableClasse();
@@ -318,8 +322,8 @@ public class RootFenetre extends JFrame {
         CreateClasse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String yearClasse = (String) comboBoxSelectYear.getSelectedItem();
-                String levelClasse = (String) comboBoxSelectLevel.getSelectedItem();
+                String yearClasse = (String) SelectNewYearClasse.getSelectedItem();
+                String levelClasse = (String) SelectNewLevelClasse.getSelectedItem();
 
                 int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
                 int idLevelClasse = new NiveauDAO(maconnexion).find(1, levelClasse).getId();
@@ -332,6 +336,28 @@ public class RootFenetre extends JFrame {
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("This class already exist in the database");
                 }
+            }
+        });
+
+        /**
+         * Dans SCHOOL LEVEL
+         * lorsque l'on clique sur gestion discipline
+         * méthode - ajouter une matière à la promo sélectionnée
+         * méthode - enlever une matière à la promo sélectionnée
+         */
+        newButtonDispiline.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String discipline = (String) tableDisciplineAbsent.getValueAt(tableDisciplineAbsent.getSelectedRow(), tableDisciplineAbsent.getSelectedColumn());
+               Discipline discipline1 =  new DisciplineDAO(maconnexion).find(1, discipline);
+                int idyear = new AnneeScolaireDA0(maconnexion).find(1, (String) comboBoxSelectYear.getSelectedItem()).getId();
+                int idlevel = new NiveauDAO(maconnexion).find(1, (String) comboBoxSelectLevel.getSelectedItem()).getId();
+
+               new DisciplineDAO(maconnexion).addDisciplinetoPromo(discipline1, idyear, idlevel);
+
+               refillTableDisplineNotPresent();
+               refillTableDiscipline();
+               refillComboBoxDiscipline();
             }
         });
 
@@ -569,6 +595,18 @@ public class RootFenetre extends JFrame {
                 refillTableTeacherSchool();
             }
         });
+
+        /**
+         * Gestion Teacher / matière dans une classe
+         */
+
+        ActionClasseSubject.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                refillTableTeacherPresent();
+            }
+        });
     }
 
 
@@ -628,6 +666,7 @@ public class RootFenetre extends JFrame {
 
     public void refillComboBoxDiscipline (){
         int idClasse = FindIdClasseForStudent();
+        System.out.println("Id CLASSE :: "+ idClasse);
         new DisciplineDAO(maconnexion).findAll(idClasse).forEach(discipline -> {
             System.out.println(discipline.getNom_classe());
             comboBoxSelectDispline.addItem(discipline.getNom_classe());
@@ -710,6 +749,11 @@ public class RootFenetre extends JFrame {
         tableTeacherSchool.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).findAllTeacher()));
     }
 
+    public void refillTableTeacherPresent () {
+
+        tableTeacherPresent.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).findAll(FindIdClasseForStudent(), (String) comboBoxSelectDispline.getSelectedItem())));
+    }
+
 
 
     private void createUIComponents() {
@@ -724,5 +768,7 @@ public class RootFenetre extends JFrame {
         tableDisplineSchool = new JTable(new TableDiscipline());
         tableStudentSchool = new JTable(new TableStudent());
         tableTeacherSchool = new JTable(new TableTeacher());
+
+        tableTeacherPresent = new JTable(new TableTeacher());
     }
 }
