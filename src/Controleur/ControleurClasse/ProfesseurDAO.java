@@ -1,5 +1,6 @@
 package Controleur.ControleurClasse;
 
+import Modele.Discipline;
 import Modele.Eleve;
 import Modele.Inscription;
 import Modele.Professeur;
@@ -107,11 +108,11 @@ public class ProfesseurDAO extends Controleur<Professeur> {
 
         public Professeur find(int id, String name) {
             Professeur eleve = new Professeur();
-
+            String [] data = name.split(" ", 2);
             try {
                 ResultSet result = this.connect.getConn().createStatement(
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE nom_personne ='" + name + "'");
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE nom_personne ='" + data[0] + "' AND prenom_personne = '" + data[1] + "' AND type_personne = '1'");
                 if(result.first())
                     eleve = new Professeur(
                             result.getInt("id_personne"),
@@ -294,6 +295,19 @@ public class ProfesseurDAO extends Controleur<Professeur> {
             }
             return ArrayList;
         }
+
+        public boolean UpdateTeacherClasse (int idTeacher, int idClasse, int idDiscipline ) {
+            try {
+            Statement stmt = this.connect.getConn().createStatement();
+            stmt.executeUpdate("UPDATE enseignement SET id_personne = '" + idTeacher + "' WHERE id_classe = '" + idClasse + "' AND id_discipline = '" + idDiscipline + "'");
+                    return true;
+                }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
     }
 
 
