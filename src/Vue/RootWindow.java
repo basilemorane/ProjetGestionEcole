@@ -625,12 +625,6 @@ public class RootWindow extends JFrame {
         });
 
         /**
-         * JE SAIS PAS OU METTRE L'AJOUT DE PERSONNE DANS UNE CLASSE AINSI QUE LA SUPPREMSION D'UNE PERSONNE DANS LA CLASSE
-         * A Y PENSER
-         * VOILA VOILA
-         */
-
-        /**
          * Je pense mettre un genre de truc un nouvelle onglet sur les classe ou tu peux selectionner tous les eleves sans classe
          */
     }

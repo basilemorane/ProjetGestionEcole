@@ -111,6 +111,10 @@ public class RootFenetre extends JFrame {
     private JButton buttonUpdateAnneeScholaire;
     private JTable tableBulletinsClasse;
     private JTextField textField1;
+    private JTable tableStudentNotes;
+    private JTextField textField2;
+    private JTextField textField4;
+    private JButton button1;
 
     public Connexion maconnexion ;
 
@@ -198,14 +202,7 @@ public class RootFenetre extends JFrame {
                 refillTableDisplineNotPresent();
                 refillTableTeacherAbsent();
                 refillTableTeacherPresent();
-
                 refillComboBoxTeacher ();
-            }
-        });
-
-        comboBoxSelectTeacher.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
             }
         });
@@ -779,6 +776,14 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        GradesStudent.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+
+                refillTableNotes();
+            }
+        });
     }
 
 
@@ -825,6 +830,23 @@ public class RootFenetre extends JFrame {
 
     public int FindIdTeacher (String name) {
        return new ProfesseurDAO(maconnexion).find(1, name).getId();
+    }
+
+    public int FindIdStudent (){
+       return new DAOEleve(maconnexion).find (1, (String) comboBoxSelectStudent.getSelectedItem()).getId();
+    }
+
+    public int FindIdInscription (){
+        int idClasse = FindIdClasseForStudent();
+        int idEleve = FindIdStudent();
+        return new InscriptionDAO(maconnexion).find(new Inscription(1, idClasse, idEleve)).getId();
+    }
+
+    public int FindIdEnseignement (){
+        int idClasse = FindIdClasseForStudent();
+        int idDiscipline = FindIdDiscipline();
+        int idProf = FindIdTeacher((String) comboBoxSelectTeacher.getSelectedItem());
+        return new ProfesseurDAO(maconnexion).FindEnseignement(new Enseignement(1, idClasse, idDiscipline, idProf));
     }
 
     /**
@@ -978,6 +1000,10 @@ public class RootFenetre extends JFrame {
         tableTrimestre.setModel(new TableTrimestre(new TrimestreDAO(maconnexion).findAll( new AnneeScolaireDA0(maconnexion).find(1, Year))));
     }
 
+    public void refillTableNotes (){
+        tableStudentNotes.setModel(new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription())));
+    }
+
 
 
     private void createUIComponents() {
@@ -1000,5 +1026,7 @@ public class RootFenetre extends JFrame {
         tableTeacherAbsent = new JTable(new TableTeacher());
 
         tableTrimestre = new JTable(new TableTrimestre());
+
+        tableStudentNotes = new JTable(new TableStudentGrades());
     }
 }

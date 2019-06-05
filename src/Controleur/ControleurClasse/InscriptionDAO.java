@@ -55,13 +55,26 @@ public class InscriptionDAO extends Controleur<Inscription> {
         }
 
         public boolean update(Inscription obj, String newName) {
-
                 return false;
-
         }
 
         public Inscription find (Inscription obj){
-            return obj;
+            Inscription inscription = new Inscription();
+           try {
+               ResultSet result = this.connect.getConn().createStatement(
+                       ResultSet.TYPE_SCROLL_INSENSITIVE,
+                       ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM inscription WHERE id_personne = " + obj.getId_personne() + " AND id_classe = " + obj.getId_classe());
+               if (result.first()) {
+                   inscription = new Inscription(
+                           result.getInt("id_inscription"),
+                           result.getInt("id_classe"),
+                           result.getInt("id_personne")
+                   );
+               }
+           } catch (SQLException e){
+               e.printStackTrace();
+           }
+            return inscription;
         }
 
         public Inscription find(int id) {

@@ -1,9 +1,6 @@
 package Controleur.ControleurClasse;
 
-import Modele.Discipline;
-import Modele.Eleve;
-import Modele.Inscription;
-import Modele.Professeur;
+import Modele.*;
 import Controleur.Connexion;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -308,6 +305,21 @@ public class ProfesseurDAO extends Controleur<Professeur> {
             return false;
         }
 
-    }
+        public int FindEnseignement (Enseignement obj){
+            int id = 0;
+            try {
+                ResultSet result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM enseignement where id_classe = " + obj.getId_classe() + " AND id_personne =" + obj.getId_personne() + " AND id_discipline = "+ obj.getId_discipline());
+                if (result.first()) {
+                id = result.getInt("id_enseignement");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+           return id;
+        }
+
+}
 
 
