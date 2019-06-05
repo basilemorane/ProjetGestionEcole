@@ -3,6 +3,7 @@ package Controleur;
 import Modele.Eleve;
 import Modele.Professeur;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 

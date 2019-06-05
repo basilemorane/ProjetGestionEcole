@@ -29,7 +29,7 @@ public class TableTrimestre extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return trimestre.get(rowIndex).getDebut() + " " + trimestre.get(rowIndex).getFin();
+        return " Trimestre :: " + trimestre.get(rowIndex).getNumero() + " :: " +  trimestre.get(rowIndex).getDebut() + " ::  " + trimestre.get(rowIndex).getFin();
     }
 
     @Override

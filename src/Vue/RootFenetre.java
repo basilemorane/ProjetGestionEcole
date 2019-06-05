@@ -109,6 +109,8 @@ public class RootFenetre extends JFrame {
     private JButton buttonCreateAnneeScolaire;
     private JButton buttonDeleteAnneeScolaire;
     private JButton buttonUpdateAnneeScholaire;
+    private JTable tableBulletinsClasse;
+    private JTextField textField1;
 
     public Connexion maconnexion ;
 
@@ -283,6 +285,24 @@ public class RootFenetre extends JFrame {
         buttonDeleteAnneeScolaire.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String DeleteYear = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
+               try {
+                   new TrimestreDAO(maconnexion).delete(new AnneeScolaireDA0(maconnexion).find(1, DeleteYear));
+                   refillTrimestre();
+                   new AnneeScolaireDA0(maconnexion).delete(new AnneeScolaireDA0(maconnexion).find(1, DeleteYear));
+                   JLabelMessage.setText("Succes deleting level school in the database");
+
+                   refillComboBoxYear();
+                   refillTableSchoolYear();
+
+               } catch (ExceptionNotExisting evt){
+                   JLabelMessage.setText("Error delete school year and trimestre");
+               }
+            }
+        });
+        buttonUpdateAnneeScholaire.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 String Selectyear = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
                 String UpdateyearSelect = textFieldAnneeScholaire.getText();
                 try {
@@ -294,17 +314,6 @@ public class RootFenetre extends JFrame {
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("This level School already existing in this database");
                 }
-            }
-        });
-        buttonUpdateAnneeScholaire.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String DeleteYear = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
-                new AnneeScolaireDA0(maconnexion).delete(new AnneeScolaireDA0(maconnexion).find(1, DeleteYear));
-                JLabelMessage.setText("Succes deleting level school in the database");
-                refillComboBoxYear();
-                refillTableSchoolYear();
-                refillTrimestre();
             }
         });
 

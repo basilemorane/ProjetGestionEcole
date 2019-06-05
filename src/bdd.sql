@@ -72,6 +72,32 @@ CREATE TABLE INSCRIPTION
     FOREIGN KEY (id_personne) REFERENCES Personne (id_personne) ON DELETE CASCADE ON UPDATE CASCADE
 )ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
 
+CREATE TABLE BULLETIN
+(
+    id_bulletin INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id_trimestre INT(11) NOT NULL,
+    id_inscription INT(11) NOT NULL,
+    FOREIGN KEY (id_trimestre) REFERENCES Trimestre (id_trimestre) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_inscription) REFERENCES inscription (id_inscription) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
+
+CREATE TABLE DETAILBULLETIN
+(
+    id_detail_bulletin INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id_bulletin INT(11) NOT NULL,
+    id_enseignement INT(11) NOT NULL,
+    FOREIGN KEY (id_bulletin) REFERENCES BULLETIN (id_bulletin) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_enseignement) REFERENCES Enseignement (id_enseignement) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
+
+CREATE TABLE EVALUATION
+(
+    id_evaluation INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id_detail_bulletin INT(11) NOT NULL,
+    note INT (11),
+    FOREIGN KEY (id_detail_bulletin) REFERENCES DETAILBULLETIN (id_detail_bulletin) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET latin1 COLLATE latin1_bin ;
+
 
 INSERT INTO `Ecole` (`id_ecole`, `nom_ecole`)
 VALUES (NULL, 'ECE PARIS');

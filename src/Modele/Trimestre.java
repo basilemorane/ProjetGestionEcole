@@ -5,19 +5,22 @@ public class Trimestre {
     private String debut;
     private String fin;
     private int id_annee;
+    private int numero;
 
     public Trimestre () {
         this.id = 0;
+        this.numero = 0;
         this.debut = "0000-01-01";
         this.fin = "0000-01-01";
         this.id_annee = 1;
     }
 
-    public Trimestre ( int id, String debut, String fin, int id_annee){
+    public Trimestre ( int id, String debut, String fin, int id_annee, int numero){
         this.id = id;
         this.debut = debut;
         this.fin = fin;
         this.id_annee = id_annee;
+        this.numero = numero;
     }
 
     public void setId(int id) {
@@ -52,4 +55,7 @@ public class Trimestre {
         this.id_annee = id_annee;
     }
 
+    public int getNumero() {
+        return numero;
+    }
 }

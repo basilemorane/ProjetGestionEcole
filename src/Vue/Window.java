@@ -198,13 +198,13 @@ public class Window extends JFrame implements ActionListener, ItemListener {
                    System.out.println( maconnexion.remplirChampsRequete("SELECT nom_ecole FROM Ecole WHERE id_ecole = 1"));
 
                     Controleur<Eleve> eleveDao = new DAOEleve(maconnexion);
-                    for(int i = 1; i < 6; i++){
+                  /*  for(int i = 1; i < 6; i++){
                         Eleve eleve = eleveDao.find(i);
                         JLabel Eleve = new JLabel("Elève N°" + eleve.getId() + "  - " + eleve.getNom() + " " + eleve.getPrenom());
                         System.out.println("Elève N°" + eleve.getId() + "  - " + eleve.getNom() + " " + eleve.getPrenom());
                         p2.add(Eleve);
                         add(p2);
-                    }
+                    }*/
 
                     /**
                      * Si la connexxion est un succès, alors on appelle la classe Controleur<AnnéeScolaire>
@@ -213,11 +213,11 @@ public class Window extends JFrame implements ActionListener, ItemListener {
                      */
                     Controleur<AnneeScolaire> yearDao = new AnneeScolaireDA0(maconnexion);
                     System.out.println("Try to call the method to look for the Schoolyear");
-                    for (int i=1; i<4; i++){
+                 /*   for (int i=1; i<4; i++){
                         AnneeScolaire year = yearDao.find(i);
                         System.out.println(year.getId() + " " + year.getYear());
                         this.ListYear.add(year.getYear());
-                    }
+                    }*/
                 } catch (ClassNotFoundException e){
                     System.out.println(e);
                     e.printStackTrace();
@@ -257,10 +257,10 @@ public class Window extends JFrame implements ActionListener, ItemListener {
              * Affiche tous les niveaux disponible de la base de données
              */
             Controleur<Niveau> niveauDao = new NiveauDAO(maconnexion);
-            for (int i = 1; i<6; i++){
+         /*   for (int i = 1; i<6; i++){
                 Niveau niveau = niveauDao.find(i);
                 ListNiveau.add(niveau.getNom());
-            }
+            }*/
         }
 
        if (e.getSource() == ListNiveau){

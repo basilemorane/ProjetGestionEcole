@@ -37,19 +37,28 @@ public class TrimestreDAO extends Controleur<Trimestre> {
         }
     }
 
-    public boolean delete(Trimestre obj) {
-
+    public boolean delete(Trimestre obj) throws ExceptionNotExisting {
         return false;
+    }
+
+    public boolean delete(AnneeScolaire obj) throws ExceptionNotExisting {
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE nom_anneScolaire ='" + obj.getYear() + "'");
+            if (result.first()) {
+                this.connect.getConn().createStatement().executeUpdate("DELETE FROM trimestre WHERE id_annee_scolaire = " + obj.getId());
+                return true ;
+            } else
+                throw new ExceptionNotExisting();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean update(Trimestre obj, String newName) {
-
         return false;
-    }
-
-    public Trimestre find(int id) {
-        Trimestre eleve = new Trimestre();
-        return eleve;
     }
 
     public Trimestre find (Trimestre obj){
@@ -69,10 +78,6 @@ public class TrimestreDAO extends Controleur<Trimestre> {
         return eleve;
     }
 
-    public Trimestre recherch ( int id, String name){
-        Trimestre eleve = new Trimestre();
-        return eleve;
-    }
 
     public ArrayList<Trimestre> findAll (AnneeScolaire obj) {
         ArrayList<Trimestre> ArrayList = new ArrayList<>();
@@ -85,7 +90,8 @@ public class TrimestreDAO extends Controleur<Trimestre> {
                             result.getInt("id_trimestre"),
                             result.getString("debut"),
                             result.getString("fin"),
-                            result.getInt("id_annee_scolaire")
+                            result.getInt("id_annee_scolaire"),
+                            result.getInt("numero")
                     ));
                 }
             } catch (SQLException e) {
