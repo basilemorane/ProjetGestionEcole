@@ -29,14 +29,35 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
                 if(result.first()) {
                     throw new ExceptionAlreadyExistant();
                 }
-            Statement stmt =  this.connect.getConn().createStatement();
-            stmt.executeUpdate("Insert INTO AnneeScolaire VALUES (Null,'" + obj.getYear()+"')");
+            /**
+             * On sépare l'année scolaire en 2 années
+             */
+            String [] data = obj.getYear().split("-", 2);
+
+            this.connect.getConn().createStatement().executeUpdate("Insert INTO AnneeScolaire VALUES (Null,'" + obj.getYear()+"')");
                 System.out.println("New school year create in the databse : ");
                 this.nombre_année_scolaire+=1;
                 return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public boolean createTrimestre (AnneeScolaire obj) throws ExceptionAlreadyExistant {
+        String [] data = obj.getYear().split("-", 2);
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE nom_anneScolaire ='" + obj.getYear() + "'");
+            if (result.first()) {
+                this.connect.getConn().createStatement().executeUpdate("Insert into trimestre VALUES (Null, 1, '" + data[0] + "-09-01', '" + data[0] + "-12-31', '" + obj.getId() + "'), (Null, 2, '" + data[1] + "-01-01', '" + data[1] + "-06-30', '" + obj.getId() + "')");
+                return true ;
+            } else
+                 throw new ExceptionAlreadyExistant();
+          } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
         }
     }
 

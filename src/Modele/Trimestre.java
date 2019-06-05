@@ -1,0 +1,55 @@
+package Modele;
+
+public class Trimestre {
+    private int id;
+    private String debut;
+    private String fin;
+    private int id_annee;
+
+    public Trimestre () {
+        this.id = 0;
+        this.debut = "0000-01-01";
+        this.fin = "0000-01-01";
+        this.id_annee = 1;
+    }
+
+    public Trimestre ( int id, String debut, String fin, int id_annee){
+        this.id = id;
+        this.debut = debut;
+        this.fin = fin;
+        this.id_annee = id_annee;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getId_annee() {
+        return id_annee;
+    }
+
+    public String getDebut() {
+        return debut;
+    }
+
+    public String getFin() {
+        return fin;
+    }
+
+    public void setDebut(String debut) {
+        this.debut = debut;
+    }
+
+    public void setFin(String fin) {
+        this.fin = fin;
+    }
+
+    public void setId_annee(int id_annee) {
+        this.id_annee = id_annee;
+    }
+
+}

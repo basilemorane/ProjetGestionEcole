@@ -102,6 +102,13 @@ public class RootFenetre extends JFrame {
     private JTabbedPane tabbedGrades;
     private JPanel ClasseGrades;
     private JPanel GradesStudent;
+    private JButton buttonAddTrimestre;
+    private JList listTrimestre;
+    private JTable tableTrimestre;
+    private JTextField textFieldAnneeScholaire;
+    private JButton buttonCreateAnneeScolaire;
+    private JButton buttonDeleteAnneeScolaire;
+    private JButton buttonUpdateAnneeScholaire;
 
     public Connexion maconnexion ;
 
@@ -161,12 +168,6 @@ public class RootFenetre extends JFrame {
          * Les méthodes pour gérer les différentes comboBox du programme
          *
          */
-       /* comboBoxSelectYear.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                refillComboBoxLevel();
-            }
-        });*/
 
         comboBoxSelectLevel.addActionListener(new ActionListener() {
             @Override
@@ -220,6 +221,7 @@ public class RootFenetre extends JFrame {
                 super.mouseClicked(e);
                 textFieldAddYearSchoo.setText((String) comboBoxSelectYear.getSelectedItem());
                 refillTableSchoolYear();
+                refillTrimestre();
 
             }
         });
@@ -260,6 +262,85 @@ public class RootFenetre extends JFrame {
                 new AnneeScolaireDA0(maconnexion).delete(new AnneeScolaireDA0(maconnexion).find(1, DeleteYear));
                 JLabelMessage.setText("Succes deleting level school in the database");
                 refillComboBoxYear();
+            }
+        });
+
+        buttonCreateAnneeScolaire.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newYear = textFieldAnneeScholaire.getText();
+                try {
+                    new AnneeScolaireDA0(maconnexion).create( new AnneeScolaire(0, newYear));
+                    JLabelMessage.setText("Adding year in the database succesfull");
+                    refillComboBoxYear();
+                    refillTableSchoolYear();
+                    refillTrimestre();
+                }catch (ExceptionAlreadyExistant expt) {
+                    JLabelMessage.setText("Problems in adding this year in the database");
+                }
+            }
+        });
+        buttonDeleteAnneeScolaire.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String Selectyear = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
+                String UpdateyearSelect = textFieldAnneeScholaire.getText();
+                try {
+                    new AnneeScolaireDA0(maconnexion).update(new AnneeScolaireDA0(maconnexion).find(1, Selectyear),UpdateyearSelect);
+                    JLabelMessage.setText("Succes updating level school in the database");
+                    refillComboBoxYear();
+                    refillTableSchoolYear();
+
+                } catch (ExceptionAlreadyExistant evt){
+                    JLabelMessage.setText("This level School already existing in this database");
+                }
+            }
+        });
+        buttonUpdateAnneeScholaire.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String DeleteYear = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
+                new AnneeScolaireDA0(maconnexion).delete(new AnneeScolaireDA0(maconnexion).find(1, DeleteYear));
+                JLabelMessage.setText("Succes deleting level school in the database");
+                refillComboBoxYear();
+                refillTableSchoolYear();
+                refillTrimestre();
+            }
+        });
+
+        /**
+         * Si on clique sur le tableau d'annee scolaire
+         *
+         *
+         */
+
+        tableSchoolYear.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                refillTrimestre();
+                textFieldAnneeScholaire.setText((String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn()));
+            }
+        });
+
+
+        /**
+         * Année Scholaire
+         * Panel Action sur School Year
+         * Gestion TRIMESTRE
+         */
+
+        buttonAddTrimestre.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String Year = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
+                try {
+                    new TrimestreDAO(maconnexion).create(new AnneeScolaireDA0(maconnexion).find(1, Year));
+                    JLabelMessage.setText("Succes adding Trimestre");
+                    refillTrimestre();
+                } catch (ExceptionAlreadyExistant evt){
+                    JLabelMessage.setText("Problem adding trimestre");
+                }
             }
         });
 
@@ -883,6 +964,11 @@ public class RootFenetre extends JFrame {
 
     }
 
+    public void refillTrimestre () {
+        String Year = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
+        tableTrimestre.setModel(new TableTrimestre(new TrimestreDAO(maconnexion).findAll( new AnneeScolaireDA0(maconnexion).find(1, Year))));
+    }
+
 
 
     private void createUIComponents() {
@@ -903,5 +989,7 @@ public class RootFenetre extends JFrame {
 
         tableTeacherPresent = new JTable(new TableTeacher());
         tableTeacherAbsent = new JTable(new TableTeacher());
+
+        tableTrimestre = new JTable(new TableTrimestre());
     }
 }
