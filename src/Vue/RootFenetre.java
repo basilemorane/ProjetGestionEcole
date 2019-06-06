@@ -7,6 +7,8 @@ import Modele.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import Controleur.*;
 
 public class RootFenetre extends JFrame {
@@ -119,6 +121,7 @@ public class RootFenetre extends JFrame {
     private JButton buttonUpdateGrades;
     private JButton buttonDeleteGrades;
     private JComboBox comboBoxSelectTrimestre;
+    private JButton putItButton;
 
     public Connexion maconnexion ;
 
@@ -162,6 +165,7 @@ public class RootFenetre extends JFrame {
                         refillTableNiveau();
 
                         refillComboBoxSelectTrimestre();
+                        refillTableDisciplineSchool();
 
                     } catch (ClassNotFoundException evt) {
                         System.out.println(evt);
@@ -442,6 +446,61 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * Dans SCHOOL LEVEL GESTION DISCIPLINE
+         * lorsque l'on clique sur gestion discipline
+         *
+         * méthode - ajouter une matière à la promo sélectionnée
+         *          - ajouter a tous les eleves de la classe un details bulletin
+         *          - on récupère tous les id d'inscription de la classe
+         *          - on récupère l'id de la matière ajouté
+         *          - on appelle la fonction create du controleur DetailsBulletin
+         *
+         * méthode - enlever une matière à la promo sélectionnée
+         *
+         * On ré-affiche les tableaux mis à jour
+         */
+        newButtonDispiline.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String discipline = (String) tableDisciplineAbsent.getValueAt(tableDisciplineAbsent.getSelectedRow(), tableDisciplineAbsent.getSelectedColumn());
+                Discipline discipline1 =  new DisciplineDAO(maconnexion).find(1, discipline);
+                int idyear = new AnneeScolaireDA0(maconnexion).find(1, (String) comboBoxSelectYear.getSelectedItem()).getId();
+                int idlevel = new NiveauDAO(maconnexion).find(1, (String) comboBoxSelectLevel.getSelectedItem()).getId();
+
+                new DisciplineDAO(maconnexion).addDisciplinetoPromo(discipline1, idyear, idlevel);
+
+                refillTableDisplineNotPresent();
+                refillTableDiscipline();
+                refillComboBoxDiscipline();
+            }
+        });
+
+        /**
+         * NE MARCHE PAS 
+         */
+        /**
+         * Pour supprimer une matière des classes du niveau sléctionné
+         */
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String discipline = (String) tableDisciplinePresent.getValueAt(tableDisciplinePresent.getSelectedRow(),tableDisciplinePresent.getSelectedColumn());
+                Discipline discipline1 =  new DisciplineDAO(maconnexion).find(1, discipline);
+                Enseignement enseignement = new Enseignement(1, discipline1.getId_discipline(), FindIdClasseForStudent(), 1);
+
+                new EnseignementDA0(maconnexion).delete(enseignement);
+
+                refillTableDisplineNotPresent();
+                refillTableDiscipline();
+                refillComboBoxDiscipline();
+            }
+        });
+
+
+
+
+
 
         /**
          * SCHOOL CLASSE
@@ -484,27 +543,6 @@ public class RootFenetre extends JFrame {
             }
         });
 
-        /**
-         * Dans SCHOOL LEVEL GESTION DISCIPLINE
-         * lorsque l'on clique sur gestion discipline
-         * méthode - ajouter une matière à la promo sélectionnée
-         * méthode - enlever une matière à la promo sélectionnée
-         */
-        newButtonDispiline.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String discipline = (String) tableDisciplineAbsent.getValueAt(tableDisciplineAbsent.getSelectedRow(), tableDisciplineAbsent.getSelectedColumn());
-               Discipline discipline1 =  new DisciplineDAO(maconnexion).find(1, discipline);
-                int idyear = new AnneeScolaireDA0(maconnexion).find(1, (String) comboBoxSelectYear.getSelectedItem()).getId();
-                int idlevel = new NiveauDAO(maconnexion).find(1, (String) comboBoxSelectLevel.getSelectedItem()).getId();
-
-               new DisciplineDAO(maconnexion).addDisciplinetoPromo(discipline1, idyear, idlevel);
-
-               refillTableDisplineNotPresent();
-               refillTableDiscipline();
-               refillComboBoxDiscipline();
-            }
-        });
 
         /**
          * Appel de la méthode pour modifier les éléments de la classe CLASSE
@@ -581,6 +619,7 @@ public class RootFenetre extends JFrame {
                     refillComboBoxStudent();
                     refillTableStudentAbsent();
                     refillTableStudentPresent(idClasse);
+
                 } catch (ExceptionNotExisting evt){
                     JLabelMessage.setText("Problem in deleting student from this classe");
                 }
@@ -619,22 +658,25 @@ public class RootFenetre extends JFrame {
                             Bulletin bulletin = new Bulletin(1, idTrimestre, idInscription);
                             new BulletinDAO(maconnexion).create(bulletin);
 
-                            new BulletinDAO(maconnexion).findAll(idInscription).forEach(bulletin1 -> {
-                                new DetailsBulletinDAO(maconnexion).findAll(bulletin1.getId()).forEach(detailsBulletin -> {
-                                    try {
-                                        new DetailsBulletinDAO(maconnexion).create(detailsBulletin);
-                                    } catch (ExceptionAlreadyExistant ebt){
-                                        JLabelMessage.setText("Problem in adding bulletins or detials bulletins");
+
+                                    /**
+                                     * On ajoute les details bulletins par matière en fonction de l'élève
+                                     * On récupère les id des bulletins de l'élève
+                                     * on récupère les id des enseignements de sa classe
+                                     * boucle permettant de générer n insert de detailsBulletin pour l'élève
+                                     */
+                                    int idinscrip = new InscriptionDAO(maconnexion).find(inscription).getId();
+                                    int idClas = FindIdClasseForStudent();
+
+                                    ArrayList<Bulletin> bull =  new BulletinDAO(maconnexion).findAll(idinscrip);
+                                    ArrayList<Enseignement> ensiegnemnt = new EnseignementDA0(maconnexion).findAll(idClas);
+
+                                    for (int i = 0; i< bull.size(); i++){
+                                        for (int y = 0; y < ensiegnemnt.size(); y++){
+                                            new DetailsBulletinDAO(maconnexion).create(ensiegnemnt.get(y).getId(), bull.get(i).getId());
+                                            System.out.println(bull.get(i).getId() + "  :: " + ensiegnemnt.get(y).getId());
+                                        }
                                     }
-                                });
-                            });
-
-
-                               /* try {
-                                    new DetailsBulletinDAO(maconnexion).create(idInscription);
-                                }catch (ExceptionAlreadyExistant evty) {
-                                    JLabelMessage.setText("Problems in adding detailsBulletin");
-                                }*/
 
                         }catch (ExceptionAlreadyExistant exceptionAlreadyExistant){
                             JLabelMessage.setText("Problem in adding bulletin to this student");
@@ -646,17 +688,25 @@ public class RootFenetre extends JFrame {
         });
 
         /**
-         * GESTION DISCIPLINE
+         * GESTION DISCIPLINE (A COMPLETER UPDATE AJOUTER A LA CLASSE )
          */
 
-        Discipline.addMouseListener(new MouseAdapter() {
+        /**
+         * Lord d'un clic sur le tableau,
+         * on met dans le textField la matière sélectionnée
+         */
+        tableDisplineSchool.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                refillTableDisciplineSchool();
+                textFieldNewDiscipline.setText( (String) tableDisplineSchool.getValueAt(tableDisplineSchool.getSelectedRow(), tableDisplineSchool.getSelectedColumn()));
             }
         });
-
+        /**
+         * Clic sur le bouton pour ajouter une discpline dans la base de données
+         * on récupère le nom de la nouvelle discipline
+         * on appelle la méthode create du controleur Discipline
+         */
         buttonCreateDiscipline.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -668,6 +718,40 @@ public class RootFenetre extends JFrame {
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("Error in creating this discipline in the database");
                 }
+            }
+        });
+
+        /**
+         * Lord du clic sur le bouton,
+         * on récupère la matière sélectionnée,
+         * on récupère la nouvelle valeur de la matière
+         * On appelle la méthode du controleur displine pour update la sléectionnée
+         */
+        buttonUpdateDiscpline.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newName = textFieldNewDiscipline.getText();
+                String displine = (String) tableDisplineSchool.getValueAt(tableDisplineSchool.getSelectedRow(), tableDisplineSchool.getSelectedColumn());
+                try {
+                    new DisciplineDAO(maconnexion).update(new Discipline(1, displine), newName);
+                    refillTableDisciplineSchool();
+                }catch (ExceptionAlreadyExistant evt){
+                    JLabelMessage.setText("Error in updating this displine");
+                }
+            }
+        });
+
+        /**
+         * lors du clic sur le bouton delete Dsicipline
+         * On recupere la matière a supprimer
+         * on appelle la methode delete du controleur Discipline
+         */
+        buttonDeleteDiscipline.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String displine = (String) tableDisplineSchool.getValueAt(tableDisplineSchool.getSelectedRow(), tableDisplineSchool.getSelectedColumn());
+                    new DisciplineDAO(maconnexion).delete(new Discipline(1, displine));
+                    refillTableDisciplineSchool();
             }
         });
 
@@ -858,11 +942,13 @@ public class RootFenetre extends JFrame {
         buttonUpdateGrades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               // int idGrades = tableStudentNotes.getSelectedRow() -1;
+              // int idGrades = tableStudentNotes.get
+
                 int idBulletin = FindIdBulletin();
                 //int idDetailBulletin
             }
         });
+
     }
 
 

@@ -26,17 +26,11 @@ public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
         return false;
     }
 
-    public boolean create(int id_inscription, int idBulletin){
+    public boolean create(int id_enseignement, int idBulletin){
         try {
-
-                ResultSet result = this.connect.getConn().createStatement(
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT DISTINCT id_enseignement FROM `enseignement` INNER JOIN inscription ON enseignement.id_classe = inscription.id_classe WHERE inscription.id_inscription = '" + id_inscription + "'");
-                    while (result.next()) {
-                        Statement stmt = this.connect.getConn().createStatement();
-                        stmt.executeUpdate("Insert Into detailbulletin VALUES (NULL, '" + idBulletin + "', '" + result.getInt("id_enseignement") + "')");
-                        return true;
-                    }
+                Statement stmt = this.connect.getConn().createStatement();
+                stmt.executeUpdate("Insert Into detailbulletin VALUES (NULL, '" + idBulletin + "', '" + id_enseignement + "')");
+                return true;
         } catch (SQLException e) {
             e.printStackTrace();
 

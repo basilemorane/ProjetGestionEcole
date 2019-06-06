@@ -58,41 +58,36 @@ public class DisciplineDAO extends Controleur<Discipline>{
     }
 
     public boolean delete(Discipline obj) {
-
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE nom_anneScolaire ='" + obj.getNom_classe() +"'");
-            if ( result.first()){
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Discipline WHERE nom_discipline = '" + obj.getNom_classe() + "'");
+            if (result.first()) {
                 Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("Delete From AnneeScolaire Where id_annee_scolaire = " + result.getInt("id_annee_scolaire"));
-                System.out.println("School year delete ");
+                stmt.executeUpdate("Delete From discipline Where id_discipline = '" + result.getInt("id_discipline") + "'");
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
         return false;
     }
 
     public boolean update(Discipline obj, String newName) throws ExceptionAlreadyExistant {
         try {
-            for ( int i=1; i< this.nombre_année_scolaire+1; i++) {
-
-                if ( find(1,newName).getId_discipline() != 0 ) {
+                ResultSet result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Discipline WHERE nom_discipline = '" + obj.getNom_classe() + "'");
+                if (result.first()) {
+                    Statement stmt = this.connect.getConn().createStatement();
+                    stmt.executeUpdate("Update Discipline SET nom_discipline = '" + newName + "' Where id_discipline = '" + result.getInt("id_discipline") + "'");
+                return true;
+                } else
                     throw new ExceptionAlreadyExistant();
-                }
-
-                Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("Update AnneeScolaire SET nom_anneScolaire = '" + newName + "' Where id_annee_scolaire = " + i + " AND nom_anneScolaire = '" + obj.getNom_classe() + "'");
-            }
-            System.out.println("school year update ");
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     public Discipline find (Discipline obj){
