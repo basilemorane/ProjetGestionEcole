@@ -112,9 +112,13 @@ public class RootFenetre extends JFrame {
     private JTable tableBulletinsClasse;
     private JTextField textField1;
     private JTable tableStudentNotes;
-    private JTextField textField2;
-    private JTextField textField4;
-    private JButton button1;
+    private JTextField textFieldAppreciationDetailsBulletin;
+    private JButton newButton;
+    private JLabel JLabelSumStudent;
+    private JComboBox comboBoxSelectNewGrades;
+    private JButton buttonUpdateGrades;
+    private JButton buttonDeleteGrades;
+    private JComboBox comboBoxSelectTrimestre;
 
     public Connexion maconnexion ;
 
@@ -150,10 +154,14 @@ public class RootFenetre extends JFrame {
                         refillTableSchoolYear();
                         refillComboBoxLevel();
 
+                        refillComboBoxSelectNewGrades ();
+
                         refillTableStudentSchool ();
                         refillTableTeacherSchool();
 
                         refillTableNiveau();
+
+                        refillComboBoxSelectTrimestre();
 
                     } catch (ClassNotFoundException evt) {
                         System.out.println(evt);
@@ -580,6 +588,8 @@ public class RootFenetre extends JFrame {
         });
         /**
          * Ajouter un élève dans la classe sélectionnée
+         * Pour se faire on ajoute lors de l'ajout d'un élève dans une classe, un bulletin et un détials bulletin associé à lélève
+         *
          */
         buttonAddStudentToClasse.addActionListener(new ActionListener() {
             @Override
@@ -591,12 +601,44 @@ public class RootFenetre extends JFrame {
                 int idClasse = FindIdClasseForStudent();
                 Inscription inscription = new Inscription(0, idClasse, Student.getId());
 
+                int idTrimestre = FindIdTrimestre();
+
+
                 try {
                     new InscriptionDAO(maconnexion).create(inscription);
                     JLabelMessage.setText("Succes in adding student from this classe");
                     refillComboBoxStudent();
                     refillTableStudentAbsent();
                     refillTableStudentPresent(idClasse);
+                        try {
+                            /**
+                             * On ajoute 2 bulletin ( 1 par trimestre ) lié à l'inscription de l'élève
+                             */
+                           int idInscription = new InscriptionDAO(maconnexion).find(inscription).getId();
+
+                            Bulletin bulletin = new Bulletin(1, idTrimestre, idInscription);
+                            new BulletinDAO(maconnexion).create(bulletin);
+
+                            new BulletinDAO(maconnexion).findAll(idInscription).forEach(bulletin1 -> {
+                                new DetailsBulletinDAO(maconnexion).findAll(bulletin1.getId()).forEach(detailsBulletin -> {
+                                    try {
+                                        new DetailsBulletinDAO(maconnexion).create(detailsBulletin);
+                                    } catch (ExceptionAlreadyExistant ebt){
+                                        JLabelMessage.setText("Problem in adding bulletins or detials bulletins");
+                                    }
+                                });
+                            });
+
+
+                               /* try {
+                                    new DetailsBulletinDAO(maconnexion).create(idInscription);
+                                }catch (ExceptionAlreadyExistant evty) {
+                                    JLabelMessage.setText("Problems in adding detailsBulletin");
+                                }*/
+
+                        }catch (ExceptionAlreadyExistant exceptionAlreadyExistant){
+                            JLabelMessage.setText("Problem in adding bulletin to this student");
+                        }
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("Problem in adding student from this classe");
                 }
@@ -776,12 +818,49 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * GRADES
+         * gestion Student
+         */
+
         GradesStudent.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-
                 refillTableNotes();
+            }
+        });
+
+        /**
+         * Si on clique sur le bouton pour ajouter une note
+         */
+
+        newButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Notes note = new Notes (1, FindIdBetailsBulletin(), (int) comboBoxSelectNewGrades.getSelectedItem());
+                try {
+                    new EvaluationDAO(maconnexion).create(note);
+                    refillTableNotes();
+                } catch (ExceptionAlreadyExistant evt ){
+                    JLabelMessage.setText("Problems in adding this note");
+                }
+            }
+        });
+
+        /**
+         * ActionListener sur le button Update grades of student
+         * On récupère la note sélectionnée en appliquant -1 à la ligne sélectionnée ( pour récupere corectement l'id de la note)
+         * on récupère la nouvelle note
+         * On appelle la méthodeUpdate du controleur Evaluation
+         * On réaffiche le tableau de notes de l'élève dans la matière sélectionnée
+         */
+        buttonUpdateGrades.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               // int idGrades = tableStudentNotes.getSelectedRow() -1;
+                int idBulletin = FindIdBulletin();
+                //int idDetailBulletin
             }
         });
     }
@@ -839,6 +918,7 @@ public class RootFenetre extends JFrame {
     public int FindIdInscription (){
         int idClasse = FindIdClasseForStudent();
         int idEleve = FindIdStudent();
+        System.out.println("id Classe :: " + idClasse + " id Eleve :: " + idEleve);
         return new InscriptionDAO(maconnexion).find(new Inscription(1, idClasse, idEleve)).getId();
     }
 
@@ -849,6 +929,20 @@ public class RootFenetre extends JFrame {
         return new ProfesseurDAO(maconnexion).FindEnseignement(new Enseignement(1, idClasse, idDiscipline, idProf));
     }
 
+    public int FindIdBulletin (){
+        /**
+         * RAJOUTER LA NOTION DE TRIMESTRE
+         */
+        return new BulletinDAO(maconnexion).findOne(1, FindIdInscription()).get(0).getId();
+    }
+
+    public int FindIdBetailsBulletin () {
+        return  new DetailsBulletinDAO(maconnexion).findOne(FindIdBulletin(), FindIdEnseignement()).get(0).getId();
+    }
+
+    public int FindIdTrimestre (){
+        return new TrimestreDAO(maconnexion).findOne(FindIdYear(), (int) comboBoxSelectTrimestre.getSelectedItem()).getId();
+    }
     /**
      * Refill the combxbox of selection
      */
@@ -915,6 +1009,18 @@ public class RootFenetre extends JFrame {
             comboBoxSelectDispline.addItem(discipline.getNom_classe());
         });
 
+    }
+
+    public void refillComboBoxSelectNewGrades () {
+        for (int i=0; i<21; i++){
+            comboBoxSelectNewGrades.addItem(i);
+        }
+    }
+
+    public void refillComboBoxSelectTrimestre () {
+        for (int i =1; i<3; i++) {
+            comboBoxSelectTrimestre.addItem(i);
+        }
     }
 
     public void refillSelectNewYearClasse (){
@@ -1001,7 +1107,10 @@ public class RootFenetre extends JFrame {
     }
 
     public void refillTableNotes (){
-        tableStudentNotes.setModel(new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription())));
+        System.out.println(" id Enseignement :: " + FindIdEnseignement() + "  Id Inscription  :: " + FindIdInscription() );
+        TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription()));
+        tableStudentNotes.setModel(table);
+        JLabelSumStudent.setText(comboBoxSelectDispline.getSelectedItem() + " Sum :: " + table.getSum() + "20");
     }
 
 

@@ -16,7 +16,21 @@ public class BulletinDAO extends Controleur<Bulletin> {
     }
 
     public boolean create(Bulletin obj) throws ExceptionAlreadyExistant {
-            return false;
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM bulletin WHERE id_inscription ='" + obj.getId_inscription() + "'");
+            if (result.first()) {
+               throw new ExceptionAlreadyExistant();
+            } else {
+                Statement stmt = this.connect.getConn().createStatement();
+                stmt.executeUpdate("INSERT INTO bulletin VALUES (NULL, '1', '" + obj.getId_inscription() + "'),(NULL, '2', '" + obj.getId_inscription() + "') ");
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean delete(Bulletin obj) {
@@ -76,15 +90,48 @@ public class BulletinDAO extends Controleur<Bulletin> {
         return YearArrayList;
     }
 
+    public ArrayList< Bulletin> findAll(int idInscription) {
+        ArrayList< Bulletin> YearArrayList = new ArrayList<>();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `bulletin` WHERE id_inscription = '" + idInscription + "' ");
+            while (result.next()) {
+                YearArrayList.add(new Bulletin(
+                        result.getInt("id_bulletin"),
+                        result.getInt("id_trimestre"),
+                        result.getInt("id_inscription")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return YearArrayList;
+    }
+
+    public ArrayList< Bulletin> findOne(int idtrimestre, int idInscription) {
+        ArrayList< Bulletin> YearArrayList = new ArrayList<>();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `bulletin`WHERE `id_trimestre` = '" + idtrimestre + "' AND id_inscription = '" + idInscription + "' ");
+            while (result.next()) {
+                YearArrayList.add(new Bulletin(
+                        result.getInt("id_bulletin"),
+                        result.getInt("id_trimestre"),
+                        result.getInt("id_inscription")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return YearArrayList;
+    }
+
     public ArrayList< Bulletin> findAll() {
         ArrayList< Bulletin> YearArrayList = new ArrayList<>();
         return YearArrayList;
     }
-
-    /**
-     * Details Bulletin
-     */
-
 
 }
 

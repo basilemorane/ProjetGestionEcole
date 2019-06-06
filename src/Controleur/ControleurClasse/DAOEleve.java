@@ -111,11 +111,11 @@ public class DAOEleve extends Controleur<Eleve> {
 
     public Eleve find(int id, String name) {
         Eleve eleve = new Eleve();
-
+        String[] data = name.split(" ", 2);
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE nom_personne ='" + name + "'");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE nom_personne ='" + data[0] + "' AND prenom_personne = '" + data[1] +"'");
             if(result.first())
                 eleve = new Eleve(
                         result.getInt("id_personne"),

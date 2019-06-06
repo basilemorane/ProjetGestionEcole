@@ -16,20 +16,12 @@ public class EvaluationDAO extends Controleur<Notes>{
     }
 
     public boolean create(Notes obj) throws ExceptionAlreadyExistant {
-
         try {
-            ResultSet result = this.connect.getConn().createStatement(
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Discipline WHERE nom_discipline ='" + obj.getId_detail_bulletin() +"'");
-            if(result.first()) {
-                throw new ExceptionAlreadyExistant();
-            }
-            Statement stmt =  this.connect.getConn().createStatement();
-            stmt.executeUpdate("Insert INTO Discipline VALUES (Null,'" + obj.getId_detail_bulletin()+"')");
+            Statement stmt = this.connect.getConn().createStatement();
+            stmt.executeUpdate("INSERT INTO `evaluation` VALUES (NULL, '" + obj.getId_detail_bulletin() + "', '" + obj.getNote() + "')");
             return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        } catch (SQLException evt ){
+            throw new ExceptionAlreadyExistant();
         }
     }
 
@@ -55,8 +47,20 @@ public class EvaluationDAO extends Controleur<Notes>{
     public boolean update(Notes obj, String newName)  {
         try {
                 Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("Update AnneeScolaire SET nom_anneScolaire = '" + newName + "' Where id_annee_scolaire  AND nom_anneScolaire = 1'");
+                stmt.executeUpdate("Update Evaluation SET notes = '" + newName + "' Where id_annee_scolaire  AND nom_anneScolaire = 1'");
             System.out.println("school year update ");
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean update(Notes obj, int idGrades)  {
+        try {
+            Statement stmt = this.connect.getConn().createStatement();
+            stmt.executeUpdate("Update Evaluation SET note = '" + obj.getNote() + "' Where id_evaluation = '" + idGrades + "'");
+            System.out.println("Grade update ");
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

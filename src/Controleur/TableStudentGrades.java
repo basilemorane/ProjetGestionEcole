@@ -19,7 +19,7 @@ public class TableStudentGrades extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -29,11 +29,25 @@ public class TableStudentGrades extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return 1;
+        if (columnIndex == 1) {
+            return this.grades.get(rowIndex).getNote() + "/20";
+        } else
+            return "Evaluation " + (rowIndex+1) ;
     }
 
     @Override
     public String getColumnName(int column) {
-        return "Student Grades";
+        if (column == 1) {
+            return "Student Grades";
+        } else
+            return "Interrogation";
+    }
+
+    public double getSum() {
+        double sum =0;
+        for (int i=0; i< grades.size(); i++){
+           sum += grades.get(i).getNote();
+        }
+        return (sum/grades.size());
     }
 }

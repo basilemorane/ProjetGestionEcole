@@ -105,6 +105,27 @@ public class TrimestreDAO extends Controleur<Trimestre> {
         return ArrayList;
     }
 
+    public Trimestre findOne (int idyear, int numtrismestre) {
+        Trimestre trimestre = new Trimestre();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `trimestre` INNER JOIN anneescolaire ON trimestre.id_annee_scolaire = anneescolaire.id_annee_scolaire WHERE anneescolaire.id_annee_scolaire = '" + idyear + "' AND trimestre.numero = '" + numtrismestre + "'");
+            while (result.next()) {
+               trimestre = new Trimestre(
+                        result.getInt("id_trimestre"),
+                        result.getString("debut"),
+                        result.getString("fin"),
+                        result.getInt("id_annee_scolaire"),
+                        result.getInt("numero")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return trimestre;
+    }
+
 
 }
 
