@@ -102,7 +102,27 @@ public class InscriptionDAO extends Controleur<Inscription> {
             ArrayList<Inscription> YearArrayList = new ArrayList<>();
             return YearArrayList;
         }
+
+    public ArrayList<Inscription> findAll (int idLevel, int idAnnee) {
+        ArrayList<Inscription> ArrayList = new ArrayList<>();
+
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `inscription` INNER JOIN classe ON inscription.id_classe = classe.id_classe WHERE classe.id_niveau ='" + idLevel + "' AND classe.id_annee_scolaire = '" + idAnnee + "'");
+            while (result.next()) {
+               ArrayList.add(new Inscription(
+                       result.getInt("id_inscription"),
+                       result.getInt("id_classe"),
+                       result.getInt("id_personne")
+               ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ArrayList;
     }
+}
 
 
 

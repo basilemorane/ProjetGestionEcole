@@ -122,6 +122,9 @@ public class RootFenetre extends JFrame {
     private JButton buttonDeleteGrades;
     private JComboBox comboBoxSelectTrimestre;
     private JButton putItButton;
+    private JButton addButton;
+    private JButton removeButton1;
+    private JButton updateButton;
 
     public Connexion maconnexion ;
 
@@ -215,7 +218,6 @@ public class RootFenetre extends JFrame {
                 refillTableTeacherAbsent();
                 refillTableTeacherPresent();
                 refillComboBoxTeacher ();
-
             }
         });
 
@@ -291,6 +293,7 @@ public class RootFenetre extends JFrame {
                 }
             }
         });
+
         buttonDeleteAnneeScolaire.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -468,17 +471,44 @@ public class RootFenetre extends JFrame {
                 int idyear = new AnneeScolaireDA0(maconnexion).find(1, (String) comboBoxSelectYear.getSelectedItem()).getId();
                 int idlevel = new NiveauDAO(maconnexion).find(1, (String) comboBoxSelectLevel.getSelectedItem()).getId();
 
+                /**
+                 * On ajoute la discipline
+                 * on récupère l'id de toutes les inscriptions dans toutes les classes du niveau sélectionné
+                 */
                 new DisciplineDAO(maconnexion).addDisciplinetoPromo(discipline1, idyear, idlevel);
 
+                    ArrayList<Inscription> inscriptions = new InscriptionDAO(maconnexion).findAll(FindIdLevel(), FindIdLevel());
+
+                /**
+                 * On récupère ainsi l'id de tous les bulletins des isncrits dans ces classes
+                 * A partir de ces id, on peut appeller la méthode create de la classe Enseignement
+                 */
+                ArrayList<Bulletin> bulletins = new ArrayList<>();
+                    for (int i=0; i<inscriptions.size(); i++) {
+                        bulletins = new BulletinDAO(maconnexion).findAll(inscriptions.get(i).getId());
+                    }
+
+                    for (int i=0; i<bulletins.size(); i++){
+                        DetailsBulletin create = new DetailsBulletin(1,bulletins.get(i).getId(), discipline1.getId_discipline());
+                        try {
+                            new DetailsBulletinDAO(maconnexion).create(create);
+                        } catch (ExceptionAlreadyExistant evt){
+                            JLabelMessage.setText("problem in creating details bulletin ");
+                        }
+                    }
+
+                /**
+                 * On re -affiche tous les tableuax présent sur le panel
+                 * Appel des sous-programmes
+                 */
                 refillTableDisplineNotPresent();
                 refillTableDiscipline();
                 refillComboBoxDiscipline();
             }
         });
 
-        /**
-         * NE MARCHE PAS 
-         */
+
+
         /**
          * Pour supprimer une matière des classes du niveau sléctionné
          */
@@ -487,10 +517,18 @@ public class RootFenetre extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String discipline = (String) tableDisciplinePresent.getValueAt(tableDisciplinePresent.getSelectedRow(),tableDisciplinePresent.getSelectedColumn());
                 Discipline discipline1 =  new DisciplineDAO(maconnexion).find(1, discipline);
-                Enseignement enseignement = new Enseignement(1, discipline1.getId_discipline(), FindIdClasseForStudent(), 1);
+                /**
+                 * On récupère tous les classes du niveau sélectionnée dans une ArrayList<>
+                 * Ensuite dans le boucle allant de 0 au nombre de classe ( normalement 2)
+                 * on appelle la méthode delete du controleur Enseignement pour toutes les classes avec en paramètre les
+                 * id des classes, et le id de la displine à supprimer
+                 */
+               ArrayList<Classe> classe =  new ClasseDA0(maconnexion).findAll(1,FindIdYear(), FindIdLevel());
 
-                new EnseignementDA0(maconnexion).delete(enseignement);
-
+               for (int i = 0; i< classe.size(); i++) {
+                   Enseignement enseignement = new Enseignement(1, classe.get(i).getId(), discipline1.getId_discipline(), 1);
+                   new EnseignementDA0(maconnexion).delete(enseignement);
+               }
                 refillTableDisplineNotPresent();
                 refillTableDiscipline();
                 refillComboBoxDiscipline();
@@ -907,11 +945,14 @@ public class RootFenetre extends JFrame {
          * gestion Student
          */
 
+
+
         GradesStudent.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 refillTableNotes();
+                refillTableBulletin();
             }
         });
 
@@ -934,7 +975,8 @@ public class RootFenetre extends JFrame {
 
         /**
          * ActionListener sur le button Update grades of student
-         * On récupère la note sélectionnée en appliquant -1 à la ligne sélectionnée ( pour récupere corectement l'id de la note)
+         * On récupère la note sélectionnée avec le nuémro de la ligne sélectionnée ( pour récupere corectement l'id de la note)
+         * et aussi la méthode getId de la classe
          * on récupère la nouvelle note
          * On appelle la méthodeUpdate du controleur Evaluation
          * On réaffiche le tableau de notes de l'élève dans la matière sélectionnée
@@ -942,13 +984,42 @@ public class RootFenetre extends JFrame {
         buttonUpdateGrades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-              // int idGrades = tableStudentNotes.get
+                int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
+                int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
 
-                int idBulletin = FindIdBulletin();
-                //int idDetailBulletin
+                TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription(), idTrimestre));
+                int idNotes = table.getId(tableStudentNotes.getSelectedRow());
+                int newGrades =  (int) comboBoxSelectNewGrades.getSelectedItem();
+
+                new EvaluationDAO(maconnexion).update(new Notes(1, 1, newGrades), idNotes);
+                refillTableNotes();
+
             }
         });
+        /**
+         * Pour supprimer un enotes d'un élève
+         * Lors de l'appui sur le bouton 'buttonDeleteGrades"
+         */
+        buttonDeleteGrades.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
+                int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
 
+                TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription(), idTrimestre));
+                int idNotes = table.getId(tableStudentNotes.getSelectedRow());
+                int newGrades =  (int) comboBoxSelectNewGrades.getSelectedItem();
+
+                new EvaluationDAO(maconnexion).delete(idNotes);
+                refillTableNotes();
+            }
+        });
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refillTableBulletin();
+            }
+        });
     }
 
 
@@ -1019,7 +1090,10 @@ public class RootFenetre extends JFrame {
         /**
          * RAJOUTER LA NOTION DE TRIMESTRE
          */
-        return new BulletinDAO(maconnexion).findOne(1, FindIdInscription()).get(0).getId();
+        int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
+        int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
+
+        return new BulletinDAO(maconnexion).findOne(idTrimestre, FindIdInscription()).get(0).getId();
     }
 
     public int FindIdBetailsBulletin () {
@@ -1194,9 +1268,33 @@ public class RootFenetre extends JFrame {
 
     public void refillTableNotes (){
         System.out.println(" id Enseignement :: " + FindIdEnseignement() + "  Id Inscription  :: " + FindIdInscription() );
-        TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription()));
+        int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
+        int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
+
+        TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription(), idTrimestre));
         tableStudentNotes.setModel(table);
         JLabelSumStudent.setText(comboBoxSelectDispline.getSelectedItem() + " Sum :: " + table.getSum() + "20");
+    }
+
+    public void refillTableBulletin (){
+        int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
+        int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
+
+        ArrayList<Enseignement> arraylist = new EnseignementDA0(maconnexion).findAll(FindIdClasseForStudent());
+        ArrayList<Discipline> listDispline = new ArrayList<>();
+
+        for (int i=0; i<arraylist.size(); i++){
+            listDispline.add(new DisciplineDAO(maconnexion).find(i));
+        }
+
+        ArrayList<Double> listSum = new ArrayList<>();
+
+        for (int i=0; i<0; i++) {
+            TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(arraylist.get(i).getId(), FindIdInscription(), idTrimestre));
+            listSum.add(table.getSum());
+        }
+
+        tableBulletinsClasse.setModel(new TableBulletin(listSum, listDispline));
     }
 
 
@@ -1223,5 +1321,8 @@ public class RootFenetre extends JFrame {
         tableTrimestre = new JTable(new TableTrimestre());
 
         tableStudentNotes = new JTable(new TableStudentGrades());
+
+        tableBulletinsClasse = new JTable(new TableBulletin());
+
     }
 }

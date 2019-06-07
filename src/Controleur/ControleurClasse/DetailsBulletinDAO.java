@@ -101,13 +101,13 @@ public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
     }
 
     public ArrayList< DetailsBulletin> findAll(int id_bulletin) {
-        ArrayList< DetailsBulletin> YearArrayList = new ArrayList<>();
+        ArrayList< DetailsBulletin> ArrayList = new ArrayList<>();
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
                     ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM detailbulletin WHERE id_bulletin ='" + id_bulletin + "'");
             while (result.next()) {
-                YearArrayList.add(new DetailsBulletin(
+                ArrayList.add(new DetailsBulletin(
                         result.getInt("id_detail_bulletin"),
                         result.getInt("id_bulletin"),
                         result.getInt("id_enseignement")
@@ -116,7 +116,7 @@ public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        return YearArrayList;
+        return ArrayList;
     }
 
 }

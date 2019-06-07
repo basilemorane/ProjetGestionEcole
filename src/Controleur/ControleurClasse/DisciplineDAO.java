@@ -100,9 +100,8 @@ public class DisciplineDAO extends Controleur<Discipline>{
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AnneeScolaire WHERE id_annee_scolaire =" + id);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM discipline WHERE id_discipline =" + id);
             if(result.first())
-                System.out.println("Find at least one SchoolYear in the database");
             year = new Discipline(
                     result.getInt("id_discipline"),
                     result.getString("nom_discipline")

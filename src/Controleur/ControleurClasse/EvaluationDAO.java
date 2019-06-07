@@ -44,6 +44,25 @@ public class EvaluationDAO extends Controleur<Notes>{
         return false;
     }
 
+    public boolean delete(int idNotes) {
+
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM evaluation WHERE id_evaluation ='" + idNotes +"'");
+            if ( result.first()){
+                Statement stmt = this.connect.getConn().createStatement();
+                stmt.executeUpdate("Delete From evaluation Where id_evaluation = " + result.getInt("id_evaluation"));
+                System.out.println("Notes delete ");
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+        return false;
+    }
+
     public boolean update(Notes obj, String newName)  {
         try {
                 Statement stmt = this.connect.getConn().createStatement();
@@ -56,10 +75,10 @@ public class EvaluationDAO extends Controleur<Notes>{
         }
     }
 
-    public boolean update(Notes obj, int idGrades)  {
+    public boolean update(Notes obj, int idEvaluation)  {
         try {
             Statement stmt = this.connect.getConn().createStatement();
-            stmt.executeUpdate("Update Evaluation SET note = '" + obj.getNote() + "' Where id_evaluation = '" + idGrades + "'");
+            stmt.executeUpdate("Update Evaluation SET note = '" + obj.getNote() + "' Where id_evaluation = '" + idEvaluation + "'");
             System.out.println("Grade update ");
             return true;
         } catch (SQLException e) {
@@ -142,12 +161,12 @@ public class EvaluationDAO extends Controleur<Notes>{
         return YearArrayList;
     }
 
-    public ArrayList<Notes> findAll (int idEnseignment, int idIsnscription) {
+    public ArrayList<Notes> findAll (int idEnseignment, int idIsnscription, int idTrimestre) {
         ArrayList<Notes> ArrayList = new ArrayList<>();
         try {
             ResultSet result =  this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `evaluation` INNER JOIN detailbulletin ON evaluation.id_detail_bulletin = detailbulletin.id_detail_bulletin Where detailbulletin.id_enseignement = '" + idEnseignment + " ' AND detailbulletin.id_bulletin = (SELECT id_bulletin from bulletin where bulletin.id_inscription = '" + idIsnscription + "')");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `evaluation` INNER JOIN detailbulletin ON evaluation.id_detail_bulletin = detailbulletin.id_detail_bulletin Where detailbulletin.id_enseignement = '" + idEnseignment + " ' AND detailbulletin.id_bulletin = (SELECT id_bulletin from bulletin where bulletin.id_inscription = '" + idIsnscription + "' AND bulletin.id_trimestre = '" + idTrimestre + "')");
             while (result.next()){
                   ArrayList.add( new Notes(
                         result.getInt("id_evaluation"),

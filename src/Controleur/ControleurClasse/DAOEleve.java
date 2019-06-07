@@ -14,8 +14,8 @@ public class DAOEleve extends Controleur<Eleve> {
 
         public DAOEleve(Connexion conn) {
             super(conn);
-            nombre = findAll().size()-1;
-            nombre_eleve = findAll().get(nombre).getId();
+           // nombre = findAll().size()-1;
+           // nombre_eleve = findAll().get(nombre).getId();
         }
 
         public boolean create(Eleve obj) throws ExceptionAlreadyExistant {
@@ -29,7 +29,6 @@ public class DAOEleve extends Controleur<Eleve> {
                     Statement stmt =  this.connect.getConn().createStatement();
                         stmt.executeUpdate("Insert INTO personne VALUES (Null,'" + obj.getNom()+"', '" + obj.getPrenom() + "', 0)");
                         System.out.println("New student create in the databse : ");
-                             this.nombre_eleve+=1;
                             return true;
                     } catch (SQLException e) {
                          e.printStackTrace();
