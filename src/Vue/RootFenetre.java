@@ -11,7 +11,39 @@ import java.util.ArrayList;
 
 import Controleur.*;
 
+/**
+ * @author
+ * Description : Cette classe RootFenetre hérite de la classe java JFrame ; elle permet de gérer tout le graphique de l'application,
+ * par le biais de Listeners :
+ *                  - actionListener
+ *                  - mouseListener
+ *                  - ItemListener
+ *
+ * par le biais de composans graphiques :
+ *                  - JPanel
+ *                  - JTextFiels
+ *                  - JLabel
+ *                  - JComboBox
+ *                  - JTable
+ *                  - JTabbedPane
+ *                  - JButton
+ *
+ *  Ses attributs prives sont aussi une maconnexion, item de la classe Connexion, qui nous permet de se connecter à la base de
+ *  données locale
+ *  Après verification de la connection, le graphique se met en place dans le programme à l'aide de sous-programme
+ *  qui remplissent les tables et les comboBox, chacune remplissant l'autre à l'aide des Listeners
+ */
 public class RootFenetre extends JFrame {
+    /**
+     * Tous les attributs privés graphique de la classe RootFenetre
+     *             - JPanel
+     *             - JTextFiels
+     *             - JLabel
+     *             - JComboBox
+     *             - JTable
+     *             - JTabbedPane
+                   - JButton
+     */
     private JPanel JPanelRoot;
     private JPanel JPanelConnect;
     private JLabel loginbdd;
@@ -126,6 +158,10 @@ public class RootFenetre extends JFrame {
     private JButton removeButton1;
     private JButton updateButton;
 
+    /**
+    L'attribut public de la classe RootFenetre qui permet la connexion à la base de données
+     Connexion maconnexion
+     */
     public Connexion maconnexion ;
 
     public RootFenetre (){
@@ -1014,6 +1050,7 @@ public class RootFenetre extends JFrame {
                 refillTableNotes();
             }
         });
+
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
