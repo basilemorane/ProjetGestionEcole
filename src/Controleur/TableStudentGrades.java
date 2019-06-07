@@ -35,6 +35,14 @@ public class TableStudentGrades extends AbstractTableModel {
             return "Evaluation " + (rowIndex+1) ;
     }
 
+    public int getSize (){
+        return grades.size();
+    }
+
+    public int getNote (int i) {
+       return this.grades.get(i).getNote();
+    }
+
 
     @Override
     public String getColumnName(int column) {
@@ -54,5 +62,9 @@ public class TableStudentGrades extends AbstractTableModel {
 
     public int getId (int i){
        return this.grades.get(i).getId_evaluation();
+    }
+
+    public String getComments (String comments) {
+        return comments;
     }
 }

@@ -900,7 +900,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="957c4" binding="ClasseGrades" layout-manager="GridLayoutManager" row-count="2" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="957c4" binding="ClasseGrades" layout-manager="GridLayoutManager" row-count="3" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <tabbedpane title="Bulletin"/>
@@ -923,15 +923,15 @@
                       </scrollpane>
                       <component id="9b2be" class="javax.swing.JLabel">
                         <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties>
                           <text value="Editer une appréciation"/>
                         </properties>
                       </component>
-                      <component id="de87f" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+                      <component id="de87f" class="javax.swing.JTextField" binding="textFieldCommentsBulletin">
                         <constraints>
-                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                         </constraints>
@@ -939,26 +939,42 @@
                       </component>
                       <component id="6aeff" class="javax.swing.JButton" binding="addButton" default-binding="true">
                         <constraints>
-                          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties>
-                          <text value="Add"/>
+                          <text value="Visualize"/>
                         </properties>
                       </component>
-                      <component id="ba110" class="javax.swing.JButton" binding="removeButton1" default-binding="true">
+                      <component id="2a558" class="javax.swing.JButton" binding="commentsButton1" default-binding="true">
                         <constraints>
-                          <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties>
-                          <text value="Remove"/>
+                          <text value="Comments"/>
                         </properties>
                       </component>
-                      <component id="2a558" class="javax.swing.JButton" binding="updateButton" default-binding="true">
+                      <component id="7a311" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Comment :: "/>
+                        </properties>
+                      </component>
+                      <component id="e383d" class="javax.swing.JLabel" binding="JLabelCommentBulletin">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Label"/>
+                        </properties>
+                      </component>
+                      <component id="8941e" class="javax.swing.JButton" binding="graphicsButtonBulletin">
                         <constraints>
                           <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties>
-                          <text value="Update"/>
+                          <text value="Graphics"/>
                         </properties>
                       </component>
                     </children>
@@ -1044,6 +1060,30 @@
                         </constraints>
                         <properties>
                           <text value="Remove"/>
+                        </properties>
+                      </component>
+                      <component id="790c7" class="javax.swing.JButton" binding="commentsButton" default-binding="true">
+                        <constraints>
+                          <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Comments"/>
+                        </properties>
+                      </component>
+                      <component id="4367" class="javax.swing.JLabel" binding="JLabelComments">
+                        <constraints>
+                          <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Label"/>
+                        </properties>
+                      </component>
+                      <component id="41c0" class="javax.swing.JButton" binding="graphicButton" default-binding="true">
+                        <constraints>
+                          <grid row="3" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Graphic"/>
                         </properties>
                       </component>
                     </children>

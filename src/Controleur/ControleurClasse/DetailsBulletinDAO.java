@@ -18,7 +18,7 @@ public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
     public boolean create (DetailsBulletin obj) throws ExceptionAlreadyExistant {
         try {
             Statement stmt = this.connect.getConn().createStatement();
-            stmt.executeUpdate("Insert Into detailbulletin VALUES (NULL, '" + obj.getId_bulletin() + "', '" + obj.getId_enseignement() + "')");
+            stmt.executeUpdate("Insert Into detailbulletin VALUES (NULL, '" + obj.getId_bulletin() + "', '" + obj.getId_enseignement() + "', ' ')");
             return true;
         } catch (SQLException e){
             e.printStackTrace();
@@ -29,13 +29,37 @@ public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
     public boolean create(int id_enseignement, int idBulletin){
         try {
                 Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("Insert Into detailbulletin VALUES (NULL, '" + idBulletin + "', '" + id_enseignement + "')");
+                stmt.executeUpdate("Insert Into detailbulletin VALUES (NULL, '" + idBulletin + "', '" + id_enseignement + "', ' ')");
                 return true;
         } catch (SQLException e) {
             e.printStackTrace();
 
         }
         return false;
+    }
+
+    public boolean updateComment (int idDetails, String comments) {
+        try {
+        Statement stmt = this.connect.getConn().createStatement();
+        stmt.executeUpdate("Update detailbulletin Set detailsbulletin_commentaire = '" + comments + "' Where id_detail_bulletin = '" + idDetails + "'");
+        return true;
+        } catch (SQLException e) {
+             e.printStackTrace();
+        }
+        return false;
+    }
+
+    public String findcomment (int idDetail) {
+       try {
+           ResultSet result = this.connect.getConn().createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY).executeQuery("Select detailsbulletin_commentaire FROM detailbulletin WHERE id_detail_bulletin = " + idDetail);
+            if (result.first())
+                return result.getString("detailsbulletin_commentaire");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+       return "";
     }
 
     public boolean delete(DetailsBulletin obj) {
@@ -91,7 +115,8 @@ public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
                 YearArrayList.add(new DetailsBulletin(
                         result.getInt("id_detail_bulletin"),
                         result.getInt("id_bulletin"),
-                        result.getInt("id_enseignement")
+                        result.getInt("id_enseignement"),
+                        result.getString("detailsbulletin_commentaire")
                 ));
             }
         } catch (SQLException e) {
@@ -110,7 +135,8 @@ public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
                 ArrayList.add(new DetailsBulletin(
                         result.getInt("id_detail_bulletin"),
                         result.getInt("id_bulletin"),
-                        result.getInt("id_enseignement")
+                        result.getInt("id_enseignement"),
+                        result.getString("detailsbulletin_commentaire")
                 ));
             }
         }catch (SQLException e){

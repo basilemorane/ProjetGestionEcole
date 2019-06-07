@@ -10,6 +10,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import Controleur.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
 
 /**
  * @author
@@ -144,7 +148,7 @@ public class RootFenetre extends JFrame {
     private JButton buttonDeleteAnneeScolaire;
     private JButton buttonUpdateAnneeScholaire;
     private JTable tableBulletinsClasse;
-    private JTextField textField1;
+    private JTextField textFieldCommentsBulletin;
     private JTable tableStudentNotes;
     private JTextField textFieldAppreciationDetailsBulletin;
     private JButton newButton;
@@ -155,8 +159,12 @@ public class RootFenetre extends JFrame {
     private JComboBox comboBoxSelectTrimestre;
     private JButton putItButton;
     private JButton addButton;
-    private JButton removeButton1;
-    private JButton updateButton;
+    private JButton commentsButton1;
+    private JButton commentsButton;
+    private JLabel JLabelComments;
+    private JLabel JLabelCommentBulletin;
+    private JButton graphicButton;
+    private JButton graphicsButtonBulletin;
 
     /**
     L'attribut public de la classe RootFenetre qui permet la connexion à la base de données
@@ -466,9 +474,9 @@ public class RootFenetre extends JFrame {
             }
         });
 
-/**
- * NE FONCTIONNE PAS A VOIR !!!!!!!
- */
+        /**
+        * Pour modifier le nom d'un noveau scolaire
+        */
         ButtonUpdateSchoolLevel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -479,6 +487,7 @@ public class RootFenetre extends JFrame {
                     new NiveauDAO(maconnexion).update(new NiveauDAO(maconnexion).find(1, updtateLevel), newnameLevel);
                     JLabelMessage.setText("Succes updating level school in the database");
                     refillComboBoxLevel();
+                    refillTableNiveau();
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("level school already existing in this database. ");
                 }
@@ -525,7 +534,7 @@ public class RootFenetre extends JFrame {
                     }
 
                     for (int i=0; i<bulletins.size(); i++){
-                        DetailsBulletin create = new DetailsBulletin(1,bulletins.get(i).getId(), discipline1.getId_discipline());
+                        DetailsBulletin create = new DetailsBulletin(1,bulletins.get(i).getId(), discipline1.getId_discipline(), "");
                         try {
                             new DetailsBulletinDAO(maconnexion).create(create);
                         } catch (ExceptionAlreadyExistant evt){
@@ -610,6 +619,15 @@ public class RootFenetre extends JFrame {
                 try {
                     new ClasseDA0(maconnexion).create(new Classe(0, newNameClasse, idyearClasse, idLevelClasse));
                     JLabelMessage.setText("Class adding in the database");
+                    /**
+                     * On ajoute toutes les matières de la classe automatiquement
+                     *  - on recherche l'id de la classe nouvelle créé
+                     *  - on appelle la méthode de EnseignementDAO pour ajouter toutes les matières dans enseignement
+                     */
+                        int idClasse = new ClasseDA0(maconnexion).find(new Classe(1, newNameClasse, idyearClasse, idLevelClasse)).getId();
+                       System.out.println(" idclsse for the add of subject :: " + idClasse);
+                        new EnseignementDA0(maconnexion).addDisicplinetoClasse(idLevelClasse, idyearClasse, idClasse);
+
                     refillComboBoxClasse();
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("This class already exist in the database");
@@ -653,6 +671,17 @@ public class RootFenetre extends JFrame {
                 refillComboBoxClasse();
             }
         });
+        /**
+         * Addlistener pour suprimer une classe de la base de donnée
+         * On appelle la méthode 'delete' de la classe ClasseDAO avec en paramètres :
+         * le niveau de la classe, son année et son nom
+         *  - lors de la suppression : on supprime aussi :
+         *          - les inscriptions
+         *          - les enseignements
+         *          - les bulletins
+         *          - les details bulletins
+         *          - les evaluations
+         */
         DeleteClasse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -729,7 +758,7 @@ public class RootFenetre extends JFrame {
                              */
                            int idInscription = new InscriptionDAO(maconnexion).find(inscription).getId();
 
-                            Bulletin bulletin = new Bulletin(1, idTrimestre, idInscription);
+                            Bulletin bulletin = new Bulletin(1, idTrimestre, idInscription, "");
                             new BulletinDAO(maconnexion).create(bulletin);
 
 
@@ -762,7 +791,7 @@ public class RootFenetre extends JFrame {
         });
 
         /**
-         * GESTION DISCIPLINE (A COMPLETER UPDATE AJOUTER A LA CLASSE )
+         * GESTION DISCIPLINE
          */
 
         /**
@@ -910,7 +939,6 @@ public class RootFenetre extends JFrame {
          * TEACHER
          */
 
-
         buttonCreateteacher.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -981,8 +1009,6 @@ public class RootFenetre extends JFrame {
          * gestion Student
          */
 
-
-
         GradesStudent.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -1010,6 +1036,22 @@ public class RootFenetre extends JFrame {
         });
 
         /**
+         * Pour ajouter un commentaire sur la matière
+         */
+
+        commentsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    String comment = textFieldAppreciationDetailsBulletin.getText();
+
+                    new DetailsBulletinDAO(maconnexion).updateComment(FindIdBetailsBulletin(), comment);
+                    refillTableNotes();
+            }
+        });
+
+
+
+        /**
          * ActionListener sur le button Update grades of student
          * On récupère la note sélectionnée avec le nuémro de la ligne sélectionnée ( pour récupere corectement l'id de la note)
          * et aussi la méthode getId de la classe
@@ -1033,7 +1075,7 @@ public class RootFenetre extends JFrame {
             }
         });
         /**
-         * Pour supprimer un enotes d'un élève
+         * Pour supprimer une note d'un élève
          * Lors de l'appui sur le bouton 'buttonDeleteGrades"
          */
         buttonDeleteGrades.addActionListener(new ActionListener() {
@@ -1055,6 +1097,127 @@ public class RootFenetre extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 refillTableBulletin();
+            }
+        });
+
+        /**
+         * Ajouter commentaire bulletin
+         *  -on recupere le commentaire en String
+         */
+        commentsButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    String comments = textFieldCommentsBulletin.getText();
+                    new BulletinDAO(maconnexion).updateBulletin(FindIdBulletin(), comments);
+
+                    refillTableBulletin();
+            }
+        });
+
+        /**
+         * On affiche la répartition des notes de l'élèves
+         */
+
+        graphicButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog RepartionNote = new JDialog();
+                RepartionNote.setTitle("Repartion des notes obtenus par l'élève");
+
+                /**
+                 * On recupere toutes les notes presentes dans la matière sélectionnée
+                 */
+
+                TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription(), FindIdTrimestre()));
+                int nombrenote = table.getSize();
+
+                int nbNt10 = 0;
+                int  nbNtSup10 = 0;
+
+                /**
+                 * On répartie les notes en fonction de la moyenne (=10)
+                 */
+                for (int i = 0; i<nombrenote; i++){
+                    if ( table.getNote(i) < 10 ){
+                        nbNt10++;
+                    } else
+                        nbNtSup10++;
+                }
+
+                /**
+                 * On affiche le piechart en fonction des notes que l'on obtenue
+                 */
+                final DefaultPieDataset pieDataset = new DefaultPieDataset();
+
+                pieDataset.setValue(" Note < 10", nbNt10);
+                pieDataset.setValue("Note > 10", nbNtSup10);
+
+                if (nbNt10 < nbNtSup10) {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Not valided Semestre", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                } else {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Valided Semestre", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                }
+            }
+        });
+        graphicsButtonBulletin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog RepartionNote = new JDialog();
+                RepartionNote.setTitle("Repartion des notes obtenus par l'élève");
+
+                /**
+                 * On recupere toutes les moyennes presente dans le bulletin de l"élève
+                 */
+                ArrayList<Discipline> arrayListDispline = new DisciplineDAO(maconnexion).findAll(FindIdClasseForStudent());
+                ArrayList<Enseignement> arraylist = new EnseignementDA0(maconnexion).findAll(FindIdClasseForStudent());
+                ArrayList<Double> listSum = new ArrayList<>();
+                for (int i=0; i<arrayListDispline.size(); i++) {
+                    TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(arraylist.get(i).getId(), FindIdInscription(), FindIdTrimestre()));
+                    listSum.add(table.getSum());
+                }
+
+                int nbNt10 = 0;
+                int  nbNtSup10 = 0;
+
+                /**
+                 * On répartie les notes en fonction de la moyenne (=10)
+                 */
+                for (int i = 0; i<listSum.size(); i++){
+                    if ( listSum.get(i) < 10 ){
+                        nbNt10++;
+                    } else
+                        nbNtSup10++;
+                }
+
+                /**
+                 * On affiche le piechart en fonction des notes que l'on obtenue
+                 */
+                final DefaultPieDataset pieDataset = new DefaultPieDataset();
+
+                pieDataset.setValue(" Sum < 10", nbNt10);
+                pieDataset.setValue(" Sum > 10", nbNtSup10);
+
+                if (nbNt10 > nbNtSup10) {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Not valided Semestre", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                } else {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Valided Semestre", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                }
             }
         });
     }
@@ -1311,27 +1474,51 @@ public class RootFenetre extends JFrame {
         TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription(), idTrimestre));
         tableStudentNotes.setModel(table);
         JLabelSumStudent.setText(comboBoxSelectDispline.getSelectedItem() + " Sum :: " + table.getSum() + "20");
+
+        JLabelComments.setText(table.getComments(new DetailsBulletinDAO(maconnexion).findcomment(FindIdBetailsBulletin())));
     }
 
     public void refillTableBulletin (){
         int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
         int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
 
+        /**
+         * On récupère les noms des displine
+         */
+        ArrayList<Discipline> arrayListDispline = new DisciplineDAO(maconnexion).findAll(FindIdClasseForStudent());
+
+        /**
+         * On recupère les moyennes des displines
+         */
         ArrayList<Enseignement> arraylist = new EnseignementDA0(maconnexion).findAll(FindIdClasseForStudent());
-        ArrayList<Discipline> listDispline = new ArrayList<>();
-
-        for (int i=0; i<arraylist.size(); i++){
-            listDispline.add(new DisciplineDAO(maconnexion).find(i));
-        }
-
         ArrayList<Double> listSum = new ArrayList<>();
-
-        for (int i=0; i<0; i++) {
+        for (int i=0; i<arrayListDispline.size(); i++) {
             TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(arraylist.get(i).getId(), FindIdInscription(), idTrimestre));
             listSum.add(table.getSum());
         }
 
-        tableBulletinsClasse.setModel(new TableBulletin(listSum, listDispline));
+        /**
+         * On récupère les commentaires de chacune des matières
+         */
+        ArrayList <String> listComment = new ArrayList<>();
+        new DetailsBulletinDAO(maconnexion).findAll(FindIdBulletin()).forEach(detailsBulletin -> {
+            listComment.add(detailsBulletin.getCommentaire());
+        });
+
+        /**
+         * On met tous les éléments du dans la classe BulletinClasse
+         *
+         */
+
+        ArrayList<BulletinClasse> bulletin = new ArrayList<>();
+        for (int i = 0; i<arrayListDispline.size(); i++){
+            bulletin.add(new BulletinClasse(arrayListDispline.get(i).getNom_classe(), listSum.get(i), listComment.get(i), ""));
+        }
+
+        TableBulletinTrimestre table = new TableBulletinTrimestre(bulletin);
+        tableBulletinsClasse.setModel(table);
+        JLabelCommentBulletin.setText(table.getComments(new BulletinDAO(maconnexion).find(FindIdBulletin(), "").getCommentaire()));
+
     }
 
 
@@ -1359,7 +1546,7 @@ public class RootFenetre extends JFrame {
 
         tableStudentNotes = new JTable(new TableStudentGrades());
 
-        tableBulletinsClasse = new JTable(new TableBulletin());
+        tableBulletinsClasse = new JTable(new TableBulletinTrimestre());
 
     }
 }

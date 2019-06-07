@@ -24,7 +24,7 @@ public class BulletinDAO extends Controleur<Bulletin> {
                throw new ExceptionAlreadyExistant();
             } else {
                 Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("INSERT INTO bulletin VALUES (NULL, '1', '" + obj.getId_inscription() + "'),(NULL, '2', '" + obj.getId_inscription() + "') ");
+                stmt.executeUpdate("INSERT INTO bulletin VALUES (NULL, '1', '" + obj.getId_inscription() + "'),(NULL, '2', '" + obj.getId_inscription() + "', " + obj.getCommentaire() + "')");
                 return true;
             }
         } catch (SQLException e) {
@@ -56,14 +56,36 @@ public class BulletinDAO extends Controleur<Bulletin> {
             return false;
         }
 
+     public void updateBulletin (int idbulletin, String comment){
+         try {
+             Statement stmt = this.connect.getConn().createStatement();
+            stmt.executeUpdate("Update Bulletin set bulletin_commentaire = '" + comment + "' Where id_bulletin = " + idbulletin);
+            } catch (SQLException e) {
+             e.printStackTrace();
+         }
+     }
 
     public Bulletin find(Bulletin obj) {
         return obj;
     }
 
-
     public Bulletin find(int id, String name) {
         Bulletin year = new Bulletin();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM `bulletin` where id_bulletin ='" + id + "' ");
+            while (result.next()) {
+               year = new Bulletin(
+                        result.getInt("id_bulletin"),
+                        result.getInt("id_trimestre"),
+                        result.getInt("id_inscription"),
+                        result.getString("bulletin_commentaire")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return year;
     }
 
@@ -81,7 +103,8 @@ public class BulletinDAO extends Controleur<Bulletin> {
                 YearArrayList.add(new Bulletin(
                         result.getInt("id_bulletin"),
                         result.getInt("id_trimestre"),
-                        result.getInt("id_annee_scolaire")
+                        result.getInt("id_inscription"),
+                        result.getString("bulletin_commentaire")
                 ));
             }
         } catch (SQLException e) {
@@ -100,7 +123,8 @@ public class BulletinDAO extends Controleur<Bulletin> {
                 YearArrayList.add(new Bulletin(
                         result.getInt("id_bulletin"),
                         result.getInt("id_trimestre"),
-                        result.getInt("id_inscription")
+                        result.getInt("id_inscription"),
+                        result.getString("bulletin_commentaire")
                 ));
             }
         } catch (SQLException e) {
@@ -119,7 +143,8 @@ public class BulletinDAO extends Controleur<Bulletin> {
                 YearArrayList.add(new Bulletin(
                         result.getInt("id_bulletin"),
                         result.getInt("id_trimestre"),
-                        result.getInt("id_inscription")
+                        result.getInt("id_inscription"),
+                        result.getString("bulletin_commentaire")
                 ));
             }
         } catch (SQLException e) {
