@@ -9,6 +9,20 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import Modele.DetailsBulletin;
 
+
+
+/**
+ * Classe DetailsBulletin  DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class DetailsBulletinDAO extends Controleur<DetailsBulletin> {
 
     public DetailsBulletinDAO (Connexion conn) {

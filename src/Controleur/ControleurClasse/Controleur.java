@@ -38,6 +38,13 @@ public abstract class Controleur <T> {
          * @return T
          */
 
+        /**
+         * Methode pour retrouver un object dans la base donnée s
+         * @param id
+         * @param name
+         * @return
+         */
+
         public abstract T find (int id, String name);
 
         public abstract T find (int id, int id1, int id2);

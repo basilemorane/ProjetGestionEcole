@@ -9,6 +9,20 @@ import java.util.ArrayList;
 import Controleur.Connexion;
 import Modele.Notes;
 
+
+
+/**
+ * Classe Evaluation DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class EvaluationDAO extends Controleur<Notes>{
 
     public EvaluationDAO(Connexion conn) {

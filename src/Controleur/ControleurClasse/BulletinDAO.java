@@ -9,6 +9,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+/**
+ * Classe Bulletin DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
 public class BulletinDAO extends Controleur<Bulletin> {
 
     public BulletinDAO (Connexion conn) {
@@ -24,7 +35,7 @@ public class BulletinDAO extends Controleur<Bulletin> {
                throw new ExceptionAlreadyExistant();
             } else {
                 Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("INSERT INTO bulletin VALUES (NULL, '1', '" + obj.getId_inscription() + "'),(NULL, '2', '" + obj.getId_inscription() + "', " + obj.getCommentaire() + "')");
+                stmt.executeUpdate("INSERT INTO bulletin VALUES (NULL, '1', '" + obj.getId_inscription() + "', '" + obj.getCommentaire() + "'), (NULL, '2', '" + obj.getId_inscription() + "', '" + obj.getCommentaire() + "')");
                 return true;
             }
         } catch (SQLException e) {
