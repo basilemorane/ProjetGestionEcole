@@ -11,6 +11,20 @@ import java.util.logging.Level;
 
 import Controleur.Connexion;
 
+
+
+/**
+ * Classe Discipline DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class DisciplineDAO extends Controleur<Discipline>{
     private int nombre_année_scolaire;
     private int nombre;
@@ -94,6 +108,7 @@ public class DisciplineDAO extends Controleur<Discipline>{
         return obj;
     }
 
+
     public Discipline find(int id) {
         Discipline year = new Discipline();
 
@@ -155,6 +170,24 @@ public class DisciplineDAO extends Controleur<Discipline>{
             e.printStackTrace();
         }
         return YearArrayList;
+    }
+
+    public ArrayList<Discipline> findAllDispline (int idBulletin) {
+        ArrayList<Discipline> DisciplineArrayList = new ArrayList<>();
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM discipline WHERE discipline.id_discipline IN ( SELECT enseignement.id_discipline FROM enseignement INNER JOIN detailbulletin ON detailbulletin.id_enseignement = enseignement.id_enseignement WHERE detailbulletin.id_bulletin = '" + idBulletin + "')");
+            while (result.next()) {
+                DisciplineArrayList.add(new Discipline(
+                        result.getInt("id_discipline"),
+                        result.getString("nom_discipline")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return DisciplineArrayList;
     }
 
     public ArrayList<Discipline> findAll (int id2) {

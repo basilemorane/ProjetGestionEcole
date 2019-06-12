@@ -2,7 +2,11 @@ package Controleur;
 
 import javax.swing.table.AbstractTableModel;
 
-public  class AbstractTable extends AbstractTableModel {
+/**
+ * Claas par default de JModeleTable
+ * N'est pas utiliser dans le projet
+ */
+public class AbstractTable extends AbstractTableModel {
 
    public  AbstractTable(){
 

@@ -10,16 +10,30 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+/**
+ * Classe AnneeScolaire
+ * permet de recuper les donnes de la base de données
+ */
 public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
     private int nombre_année_scolaire;
     private int nombre;
 
+    /**
+     * constructeur de la classe
+     * @param conn
+     */
     public AnneeScolaireDA0(Connexion conn) {
         super(conn);
         this.nombre = findAll().size() - 1;
         this.nombre_année_scolaire = findAll().get(this.nombre).getId();
     }
 
+    /**
+     * Creer une annee scolaire dans la base de donnee
+     * @param obj
+     * @return
+     * @throws ExceptionAlreadyExistant
+     */
     public boolean create(AnneeScolaire obj) throws ExceptionAlreadyExistant {
 
         try {
@@ -44,6 +58,11 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         }
     }
 
+    /**
+     * delete dans la base de données
+     * @param obj
+     * @return
+     */
     public boolean delete(AnneeScolaire obj) {
 
         try {
@@ -63,6 +82,13 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         return false;
     }
 
+    /**
+     * update dans la base de donnée
+     * @param obj
+     * @param newName
+     * @return
+     * @throws ExceptionAlreadyExistant
+     */
     public boolean update(AnneeScolaire obj, String newName) throws ExceptionAlreadyExistant {
         try {
             for (int i = 1; i < this.nombre_année_scolaire + 1; i++) {
@@ -86,7 +112,12 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         return obj;
     }
 
-
+    /**
+     * trouver une annee scolaire dans la base donnée
+     * @param id
+     * @param name
+     * @return
+     */
     public AnneeScolaire find(int id, String name) {
         AnneeScolaire year = new AnneeScolaire();
         id = 0;
@@ -111,6 +142,10 @@ public class AnneeScolaireDA0 extends Controleur<AnneeScolaire> {
         return new AnneeScolaire();
     }
 
+    /**
+     * trouevr toues les années scolaires dans la database
+     * @return
+     */
     public ArrayList<AnneeScolaire> findAll() {
         ArrayList<AnneeScolaire> YearArrayList = new ArrayList<>();
         try {

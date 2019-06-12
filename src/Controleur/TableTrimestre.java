@@ -5,6 +5,18 @@ import Modele.Trimestre;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 
+/**
+ * Classe TableModele pour la classe adéquat
+ *      - un constructeur par default
+ *      - un constructeur avec une arrayList en parametre
+ *      - methode :
+ *              - recuper nombre colonne
+ *              - recuperer nombre colonne
+ *              - recupere titre du tableau
+ *              - recupere la valeur de l'array list en fonction de la ligne et de la colonne
+ *
+ */
+
 public class TableTrimestre extends AbstractTableModel {
 
     ArrayList<Trimestre> trimestre;

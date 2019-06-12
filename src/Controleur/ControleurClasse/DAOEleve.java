@@ -8,6 +8,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+/**
+ * Classe Eleve  DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class DAOEleve extends Controleur<Eleve> {
         private int nombre;
         private int nombre_eleve;

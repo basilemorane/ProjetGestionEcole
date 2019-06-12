@@ -6,6 +6,18 @@ import Modele.Notes;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 
+/**
+ * Classe TableModele pour la classe adéquat
+ *      - un constructeur par default
+ *      - un constructeur avec une arrayList en parametre
+ *      - methode :
+ *              - recuper nombre colonne
+ *              - recuperer nombre colonne
+ *              - recupere titre du tableau
+ *              - recupere la valeur de l'array list en fonction de la ligne et de la colonne
+ *
+ */
+
 public class TableStudentGrades extends AbstractTableModel {
     ArrayList<Notes> grades;
 
@@ -35,6 +47,14 @@ public class TableStudentGrades extends AbstractTableModel {
             return "Evaluation " + (rowIndex+1) ;
     }
 
+    public int getSize (){
+        return grades.size();
+    }
+
+    public int getNote (int i) {
+       return this.grades.get(i).getNote();
+    }
+
 
     @Override
     public String getColumnName(int column) {
@@ -54,5 +74,9 @@ public class TableStudentGrades extends AbstractTableModel {
 
     public int getId (int i){
        return this.grades.get(i).getId_evaluation();
+    }
+
+    public String getComments (String comments) {
+        return comments;
     }
 }

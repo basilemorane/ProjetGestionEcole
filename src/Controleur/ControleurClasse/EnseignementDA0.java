@@ -9,6 +9,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+
+/**
+ * Classe Enseignemnt DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class EnseignementDA0 extends Controleur<Enseignement>{
 
     public EnseignementDA0(Connexion conn) {
@@ -16,7 +29,24 @@ public class EnseignementDA0 extends Controleur<Enseignement>{
     }
 
     public boolean create(Enseignement obj) throws ExceptionAlreadyExistant {
+
             return false;
+    }
+
+    public boolean addDisicplinetoClasse (int idniveau, int idannee, int idClasse) {
+        try {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT DISTINCT id_discipline FROM enseignement INNER JOIN classe ON enseignement.id_classe = classe.id_classe where classe.id_niveau = '" + idniveau + "' and classe.id_annee_scolaire = '" + idannee + "'");
+            while (result.next()) {
+                Statement stmt =  this.connect.getConn().createStatement();
+                stmt.executeUpdate("INSERT INTO enseignement VALUES (NULL, '" + idClasse + "', '" + result.getInt("id_discipline") + "', '3' )");
+            }
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean delete(Enseignement obj) {

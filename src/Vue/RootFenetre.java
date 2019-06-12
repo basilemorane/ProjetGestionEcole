@@ -10,8 +10,44 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import Controleur.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.DefaultPieDataset;
 
+/**
+ * @author
+ * Description : Cette classe RootFenetre hérite de la classe java JFrame ; elle permet de gérer tout le graphique de l'application,
+ * par le biais de Listeners :
+ *                  - actionListener
+ *                  - mouseListener
+ *                  - ItemListener
+ *
+ * par le biais de composans graphiques :
+ *                  - JPanel
+ *                  - JTextFiels
+ *                  - JLabel
+ *                  - JComboBox
+ *                  - JTable
+ *                  - JTabbedPane
+ *                  - JButton
+ *
+ *  Ses attributs prives sont aussi une maconnexion, item de la classe Connexion, qui nous permet de se connecter à la base de
+ *  données locale
+ *  Après verification de la connection, le graphique se met en place dans le programme à l'aide de sous-programme
+ *  qui remplissent les tables et les comboBox, chacune remplissant l'autre à l'aide des Listeners
+ */
 public class RootFenetre extends JFrame {
+    /**
+     * Tous les attributs privés graphique de la classe RootFenetre
+     *             - JPanel
+     *             - JTextFiels
+     *             - JLabel
+     *             - JComboBox
+     *             - JTable
+     *             - JTabbedPane
+                   - JButton
+     */
     private JPanel JPanelRoot;
     private JPanel JPanelConnect;
     private JLabel loginbdd;
@@ -112,7 +148,7 @@ public class RootFenetre extends JFrame {
     private JButton buttonDeleteAnneeScolaire;
     private JButton buttonUpdateAnneeScholaire;
     private JTable tableBulletinsClasse;
-    private JTextField textField1;
+    private JTextField textFieldCommentsBulletin;
     private JTable tableStudentNotes;
     private JTextField textFieldAppreciationDetailsBulletin;
     private JButton newButton;
@@ -123,19 +159,50 @@ public class RootFenetre extends JFrame {
     private JComboBox comboBoxSelectTrimestre;
     private JButton putItButton;
     private JButton addButton;
-    private JButton removeButton1;
-    private JButton updateButton;
+    private JButton commentsButton1;
+    private JButton commentsButton;
+    private JLabel JLabelComments;
+    private JLabel JLabelCommentBulletin;
+    private JButton graphicButton;
+    private JButton graphicsButtonBulletin;
 
+    /**
+    L'attribut public de la classe RootFenetre qui permet la connexion à la base de données
+     Connexion maconnexion
+     */
     public Connexion maconnexion ;
 
+    /**
+     * Coonstructeur par défault de la classe RootFenetre
+     */
     public RootFenetre (){
+        /**
+         * Paramètre de la JFrame générée par le constructeur
+         *  - titre
+         *  - taille
+         *  - Ajout sur la JFrame du panel principal
+         */
         setTitle("Application de gestion d'une école");
         setSize(800,600);
         add(JPanelRoot);
 
+        /**
+         * AddListener sur le bouton Connect
+         * - on vérifie les String rentrée dans les JTextFild
+         *  - Si la correction est établie : message affiché
+         *          - on charge les tableaux d'années scolaires
+         *          - on charge les datas de toutes les comboBox du programme
+         */
+
         connectJButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                /**
+                 * In récupère les String de connection
+                 *  - password de la base donnée
+                 *  - ligin de la base de donnée
+                 *  - nom de la base de données
+                 */
                 String passBdd = "";//new String (pswBddText.getPassword());
                 String loginBdd = "root";//new String (loginBddText.getText());
                 String nameBdd = "gestionecole";//new String (nameBddtext.getText());
@@ -187,7 +254,17 @@ public class RootFenetre extends JFrame {
 
         /**
          * Les méthodes pour gérer les différentes comboBox du programme
+         *   - addListener sur les comboBox
+         * On appelle toutes les fonctions pour remplir les comboBox
+         *  - refillComBoBoxClasse
+         *  - refillComBoBoxStudent
+         *  - refillComBoBoxYear
+         *  - refillComBoBoxTeacher
+         *  - refillComBoBoxDiscipline
+         *  - refillComBoBoxTrimestre
          *
+         * On appelle par la meme occasion les fonctions pour remplir les JTables
+         *  - refilltable... nom de la table
          */
 
         comboBoxSelectLevel.addActionListener(new ActionListener() {
@@ -228,6 +305,11 @@ public class RootFenetre extends JFrame {
          * Supprimer une année scolaire
          */
 
+        /**
+         * Lors d'un clic sur ce panel, on remplit la table d'année scolaire et la table de trimestre
+         * on remplit aussi avec le JYexfile avec l'item selectionnée dans la comboBox
+         */
+
         SchoolYearTabbed.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -239,6 +321,12 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * Ajouter une année scolaire
+         * On recupere la string de la nouvelle année
+         * on appelle la methode create du DAOInscription
+         * on envoie une message de succes ou de non succes
+         */
         buttonAddYearSchool.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -253,6 +341,13 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * Modifier le nom d'une année scolaire
+         * on recupère le nouveau nom de l'année scolaire
+         * on recupere le nom de l'annee à modifier dans le JTable
+         * on appelle la methode Update du AnneeScolaireDAO
+         * Message succes / non succes
+         */
         updateButtonYear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -268,6 +363,12 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * Supprimer une annee scolaire
+         * On recupere la valeur de l'année à supprimer dans le Jtable
+         * On appelle la méthode delete de AnnneScolaireDAO
+         * message succes
+         */
         deleteButtonYear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -278,6 +379,12 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * Ajouter une année scolaire
+         * On recupere la string de la nouvelle année
+         * on appelle la methode create du DAOInscription
+         * on envoie une message de succes ou de non succes
+         */
         buttonCreateAnneeScolaire.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -293,7 +400,12 @@ public class RootFenetre extends JFrame {
                 }
             }
         });
-
+        /**
+        * Supprimer une annee scolaire
+        * On recupere la valeur de l'année à supprimer dans le Jtable
+         * On appelle la méthode delete de AnnneScolaireDAO
+         * message succes
+        */
         buttonDeleteAnneeScolaire.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -312,6 +424,13 @@ public class RootFenetre extends JFrame {
                }
             }
         });
+        /**
+         * Modifier le nom d'une année scolaire
+         * on recupère le nouveau nom de l'année scolaire
+         * on recupere le nom de l'annee à modifier dans le JTable
+         * on appelle la methode Update du AnneeScolaireDAO
+         * Message succes / non succes
+         */
         buttonUpdateAnneeScholaire.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -331,7 +450,8 @@ public class RootFenetre extends JFrame {
 
         /**
          * Si on clique sur le tableau d'annee scolaire
-         *
+         * on re remplit le tableau de trimestre
+         * On ajoute dans la JTextField le nom de l'ann&e Scolaire selctionnée dans le tableai
          *
          */
 
@@ -349,6 +469,7 @@ public class RootFenetre extends JFrame {
          * Année Scholaire
          * Panel Action sur School Year
          * Gestion TRIMESTRE
+         * On ajoute 2 trimestre automatiquement lors de la création d'une annéee scolaire
          */
 
         buttonAddTrimestre.addActionListener(new ActionListener() {
@@ -366,7 +487,10 @@ public class RootFenetre extends JFrame {
         });
 
         /**
-         * SCHOOL LEVEL
+         * JPannel SCHOOL LEVEL
+         * Lors d'un clic sur le JPanle
+         * On recupère la valeur de niveau selectionnée dans le tableau
+         * on actualise la tableau de niveau , si modification
          */
 
         LevelTabbed.addMouseListener(new MouseAdapter() {
@@ -398,6 +522,11 @@ public class RootFenetre extends JFrame {
          * ADD, DELETE, UPDATE
          */
 
+        /**
+         * Delete une année scolaire
+         * on recupere le nom de l'anne à supprimer dans le tableau
+         * on appelle la méthode
+         */
         ButtonDeleteSchoolLevel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -414,6 +543,11 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * Create une année scolaire
+         * on recupere le nom de l'anne à a ajouter dans le tableau
+         * on appelle la méthode
+         */
         ButtonAddSchoolLevel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -430,19 +564,21 @@ public class RootFenetre extends JFrame {
             }
         });
 
-/**
- * NE FONCTIONNE PAS A VOIR !!!!!!!
- */
+        /**
+        * Pour modifier le nom d'un noveau scolaire
+         * On recupere le nom de l'annee dans le tableau
+         * on appelle la methode du controleur
+        */
         ButtonUpdateSchoolLevel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String updtateLevel = (String) tableLevelSchool.getValueAt(tableLevelSchool.getSelectedRow(), tableLevelSchool.getSelectedColumn());
-
                 String newnameLevel = textFieldSchoolLevel.getText();
                 try {
                     new NiveauDAO(maconnexion).update(new NiveauDAO(maconnexion).find(1, updtateLevel), newnameLevel);
                     JLabelMessage.setText("Succes updating level school in the database");
                     refillComboBoxLevel();
+                    refillTableNiveau();
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("level school already existing in this database. ");
                 }
@@ -489,7 +625,7 @@ public class RootFenetre extends JFrame {
                     }
 
                     for (int i=0; i<bulletins.size(); i++){
-                        DetailsBulletin create = new DetailsBulletin(1,bulletins.get(i).getId(), discipline1.getId_discipline());
+                        DetailsBulletin create = new DetailsBulletin(1,bulletins.get(i).getId(), discipline1.getId_discipline(), "");
                         try {
                             new DetailsBulletinDAO(maconnexion).create(create);
                         } catch (ExceptionAlreadyExistant evt){
@@ -529,6 +665,12 @@ public class RootFenetre extends JFrame {
                    Enseignement enseignement = new Enseignement(1, classe.get(i).getId(), discipline1.getId_discipline(), 1);
                    new EnseignementDA0(maconnexion).delete(enseignement);
                }
+                /**
+                 * On actualise les tableaux de ce Jpanel
+                 *  - tableau de discipline absent dans la classe
+                 *  - tableau de disncible present dans la classe
+                 *  - comboBox de discipline
+                 */
                 refillTableDisplineNotPresent();
                 refillTableDiscipline();
                 refillComboBoxDiscipline();
@@ -541,7 +683,16 @@ public class RootFenetre extends JFrame {
 
 
         /**
-         * SCHOOL CLASSE
+         * AddListenr sur le JPanel SCHOOL CLASSE
+         *
+         * Clic sur le JPanelTabbed de CLASSE
+         *  on remplit les comboxBox concernant ce JPanel
+         *  et toutes les comboBox de selction dependant de la classe :
+         *          - eleve
+         *          - teacher
+         *          - discipline
+         *          - trimestre
+         *          - tableau de classe ...
          */
         ClasseTabbed.addMouseListener(new MouseAdapter() {
             @Override
@@ -558,6 +709,12 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * AddListenr pour creer une classe
+         * en fonction de l'année
+         * en focntion d'un niveau scolaire
+         * on ajoute toutes les matières des autres ayant les mêmes attributs
+         */
         CreateClasse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -574,6 +731,15 @@ public class RootFenetre extends JFrame {
                 try {
                     new ClasseDA0(maconnexion).create(new Classe(0, newNameClasse, idyearClasse, idLevelClasse));
                     JLabelMessage.setText("Class adding in the database");
+                    /**
+                     * On ajoute toutes les matières de la classe automatiquement
+                     *  - on recherche l'id de la classe nouvelle créé
+                     *  - on appelle la méthode de EnseignementDAO pour ajouter toutes les matières dans enseignement
+                     */
+                        int idClasse = new ClasseDA0(maconnexion).find(new Classe(1, newNameClasse, idyearClasse, idLevelClasse)).getId();
+                       System.out.println(" idclsse for the add of subject :: " + idClasse);
+                        new EnseignementDA0(maconnexion).addDisicplinetoClasse(idLevelClasse, idyearClasse, idClasse);
+
                     refillComboBoxClasse();
                 } catch (ExceptionAlreadyExistant evt){
                     JLabelMessage.setText("This class already exist in the database");
@@ -617,6 +783,17 @@ public class RootFenetre extends JFrame {
                 refillComboBoxClasse();
             }
         });
+        /**
+         * Addlistener pour suprimer une classe de la base de donnée
+         * On appelle la méthode 'delete' de la classe ClasseDAO avec en paramètres :
+         * le niveau de la classe, son année et son nom
+         *  - lors de la suppression : on supprime aussi :
+         *          - les inscriptions
+         *          - les enseignements
+         *          - les bulletins
+         *          - les details bulletins
+         *          - les evaluations
+         */
         DeleteClasse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -680,6 +857,11 @@ public class RootFenetre extends JFrame {
 
                 int idTrimestre = FindIdTrimestre();
 
+                /**
+                 * Lors de l'ajout d'un élève dans la classe, on lui associe  :
+                 *          - 2 bulletins
+                 *          - 2 fois n details bulletins ( n ayant le nombre de matière dans la classe )
+                 */
 
                 try {
                     new InscriptionDAO(maconnexion).create(inscription);
@@ -693,7 +875,7 @@ public class RootFenetre extends JFrame {
                              */
                            int idInscription = new InscriptionDAO(maconnexion).find(inscription).getId();
 
-                            Bulletin bulletin = new Bulletin(1, idTrimestre, idInscription);
+                            Bulletin bulletin = new Bulletin(1, idTrimestre, idInscription, "");
                             new BulletinDAO(maconnexion).create(bulletin);
 
 
@@ -726,7 +908,7 @@ public class RootFenetre extends JFrame {
         });
 
         /**
-         * GESTION DISCIPLINE (A COMPLETER UPDATE AJOUTER A LA CLASSE )
+         * GESTION DISCIPLINE
          */
 
         /**
@@ -812,6 +994,9 @@ public class RootFenetre extends JFrame {
 
         /**
          * On veut ajouter un eleve dans la base de donnée
+         * On recupere son nom et son prenom
+         * On appelle la methode create du controleur DAOEleve
+         * message succes / non succes
          */
 
         buttonCreateStudent.addActionListener(new ActionListener() {
@@ -858,6 +1043,7 @@ public class RootFenetre extends JFrame {
 
         /**
          * Gestion des clic qur le tableau de tous les étudiants
+         *      - on remplit les JTextField en fonction de la ligne du tableau selectionnée
          */
         tableStudentSchool.addMouseListener(new MouseAdapter() {
             @Override
@@ -871,10 +1057,21 @@ public class RootFenetre extends JFrame {
         });
 
         /**
-         * TEACHER
+         * JPANELTABBED TEACHER
+         *  - methodes :
+         *          - creer un professeur
+         *          - modifier un professeur
+         *          - supprimer un professeur
+         *  Pour se faire on appelle les methodes du controleur professeur en ayant recuperezr les items que l'on voualit
+         *  dans le tableua pour update / delete
+         *  et dans le JTextFiel pour create
          */
 
 
+        /**
+         * Ajout d'un porfesseur dans une classe
+         * message de succes / non succes ( Exception)
+         */
         buttonCreateteacher.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -890,6 +1087,9 @@ public class RootFenetre extends JFrame {
             }
         });
 
+        /**
+         * Methode pour modifer le nom d'un professeur
+         */
         buttonUpdatingTeacher.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -900,7 +1100,9 @@ public class RootFenetre extends JFrame {
             }
         });
 
-
+        /**
+         * Methode pour supprimer un proffeseur de la base de donnée
+         */
         buttonDeleteTeacher.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -914,6 +1116,7 @@ public class RootFenetre extends JFrame {
 
         /**
          * Gestion Teacher / matière dans une classe
+         * Lors d'un clic, on actualise les tableaux present dans ce JPanel
          */
 
         ActionClasseSubject.addMouseListener(new MouseAdapter() {
@@ -926,6 +1129,11 @@ public class RootFenetre extends JFrame {
         });
         /**
          * Gestion Teacher
+         * On recupere l'id du professeur a ajouter
+         * on appelle la methode
+         *  si il existe
+         *  on udtabe son enseignment adequat
+         *  on actualise les tableaux et les comboBoxs
          */
         ButtonPutTeacherInClasse.addActionListener(new ActionListener() {
             @Override
@@ -943,9 +1151,9 @@ public class RootFenetre extends JFrame {
         /**
          * GRADES
          * gestion Student
+         *
+         * Lors d'un clic, on actualise les notes et le bulletin de l'éleve selectionnée
          */
-
-
 
         GradesStudent.addMouseListener(new MouseAdapter() {
             @Override
@@ -957,7 +1165,11 @@ public class RootFenetre extends JFrame {
         });
 
         /**
-         * Si on clique sur le bouton pour ajouter une note
+         * Si on clique sur le bouton
+         * ajouter une note
+         * on recupere la note a ajoutezr
+         * on appelle la methode
+         * on actualise le tableau
          */
 
         newButton.addActionListener(new ActionListener() {
@@ -972,6 +1184,26 @@ public class RootFenetre extends JFrame {
                 }
             }
         });
+
+        /**
+         * Pour ajouter un commentaire sur la matière
+         * on recupere le commentaire de la matière
+         * on recupere l'idbulletin adequat
+         * on appelle la methode udpateComment
+         * on actualise la table
+         */
+
+        commentsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    String comment = textFieldAppreciationDetailsBulletin.getText();
+
+                    new DetailsBulletinDAO(maconnexion).updateComment(FindIdBetailsBulletin(), comment);
+                    refillTableNotes();
+            }
+        });
+
+
 
         /**
          * ActionListener sur le button Update grades of student
@@ -997,7 +1229,7 @@ public class RootFenetre extends JFrame {
             }
         });
         /**
-         * Pour supprimer un enotes d'un élève
+         * Pour supprimer une note d'un élève
          * Lors de l'appui sur le bouton 'buttonDeleteGrades"
          */
         buttonDeleteGrades.addActionListener(new ActionListener() {
@@ -1014,10 +1246,136 @@ public class RootFenetre extends JFrame {
                 refillTableNotes();
             }
         });
+
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 refillTableBulletin();
+            }
+        });
+
+        /**
+         * Ajouter commentaire bulletin
+         *  -on recupere le commentaire en String
+         */
+        commentsButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    String comments = textFieldCommentsBulletin.getText();
+                    new BulletinDAO(maconnexion).updateBulletin(FindIdBulletin(), comments);
+
+                    refillTableBulletin();
+            }
+        });
+
+        /**
+         * On affiche la répartition des notes de l'élèves
+         */
+
+        graphicButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog RepartionNote = new JDialog();
+                RepartionNote.setTitle("Repartion des notes obtenus par l'élève");
+
+                /**
+                 * On recupere toutes les notes presentes dans la matière sélectionnée
+                 */
+
+                TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription(), FindIdTrimestre()));
+                int nombrenote = table.getSize();
+
+                int nbNt10 = 0;
+                int  nbNtSup10 = 0;
+
+                /**
+                 * On répartie les notes en fonction de la moyenne (=10)
+                 */
+                for (int i = 0; i<nombrenote; i++){
+                    if ( table.getNote(i) < 10 ){
+                        nbNt10++;
+                    } else
+                        nbNtSup10++;
+                }
+
+                /**
+                 * On affiche le piechart en fonction des notes que l'on obtenue
+                 */
+                final DefaultPieDataset pieDataset = new DefaultPieDataset();
+
+                pieDataset.setValue(" Note < 10", nbNt10);
+                pieDataset.setValue("Note > 10", nbNtSup10);
+
+                if (nbNt10 > nbNtSup10) {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Not valided Subject", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                } else {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Valided Subject", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                }
+            }
+        });
+
+        /**
+         * Addlistener pour afficher le graphe du bulletin et les repartions des moyennes
+         */
+        graphicsButtonBulletin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JDialog RepartionNote = new JDialog();
+                RepartionNote.setTitle("Repartion des notes obtenus par l'élève");
+
+                /**
+                 * On recupere toutes les moyennes presente dans le bulletin de l"élève
+                 */
+                ArrayList<Discipline> arrayListDispline = new DisciplineDAO(maconnexion).findAll(FindIdClasseForStudent());
+                ArrayList<Enseignement> arraylist = new EnseignementDA0(maconnexion).findAll(FindIdClasseForStudent());
+                ArrayList<Double> listSum = new ArrayList<>();
+                for (int i=0; i<arrayListDispline.size(); i++) {
+                    TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(arraylist.get(i).getId(), FindIdInscription(), FindIdTrimestre()));
+                    listSum.add(table.getSum());
+                }
+
+                int nbNt10 = 0;
+                int  nbNtSup10 = 0;
+
+                /**
+                 * On répartie les notes en fonction de la moyenne (=10)
+                 */
+                for (int i = 0; i<listSum.size(); i++){
+                    if ( listSum.get(i) < 10 ){
+                        nbNt10++;
+                    } else
+                        nbNtSup10++;
+                }
+
+                /**
+                 * On affiche le piechart en fonction des notes que l'on obtenue
+                 */
+                final DefaultPieDataset pieDataset = new DefaultPieDataset();
+
+                pieDataset.setValue(" Sum < 10", nbNt10);
+                pieDataset.setValue(" Sum > 10", nbNtSup10);
+
+                if (nbNt10 > nbNtSup10) {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Not valided Semestre", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                } else {
+                    final JFreeChart pieChart = ChartFactory.createPieChart("Valided Semestre", pieDataset, true, false, false);
+                    final ChartPanel cPanel = new ChartPanel(pieChart);
+                    RepartionNote.getContentPane().add(cPanel);
+                    RepartionNote.pack();
+                    RepartionNote.setVisible(true);
+                }
             }
         });
     }
@@ -1035,7 +1393,7 @@ public class RootFenetre extends JFrame {
      */
 
     /**
-     * Find id of object
+     * Find id of object de la comBoBox selectionné
      */
 
     public int FindIdYear (){
@@ -1043,15 +1401,28 @@ public class RootFenetre extends JFrame {
         return new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
     }
 
+    /**
+     * Find Id du niveau de la comBoBox
+     * @return int
+     */
     public int FindIdLevel () {
         String levelClasse = (String) comboBoxSelectLevel.getSelectedItem();
        return new NiveauDAO(maconnexion).find(1, levelClasse).getId();
     }
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
 
     public int FindIdDiscipline () {
         String DisciplineClasse = (String) comboBoxSelectDispline.getSelectedItem();
         return new DisciplineDAO(maconnexion).find(1, DisciplineClasse).getId_discipline();
     }
+
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
 
     public int FindIdClasseForStudent () {
         String yearClasse = (String) comboBoxSelectYear.getSelectedItem();
@@ -1063,14 +1434,26 @@ public class RootFenetre extends JFrame {
         Classe classe = new Classe(1,nameClasse, idyearClasse, idLevelClasse);
         return new ClasseDA0(maconnexion).find(classe).getId();
     }
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
 
     public int FindIdTeacher (String name) {
        return new ProfesseurDAO(maconnexion).find(1, name).getId();
     }
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
 
     public int FindIdStudent (){
        return new DAOEleve(maconnexion).find (1, (String) comboBoxSelectStudent.getSelectedItem()).getId();
     }
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
 
     public int FindIdInscription (){
         int idClasse = FindIdClasseForStudent();
@@ -1078,6 +1461,10 @@ public class RootFenetre extends JFrame {
         System.out.println("id Classe :: " + idClasse + " id Eleve :: " + idEleve);
         return new InscriptionDAO(maconnexion).find(new Inscription(1, idClasse, idEleve)).getId();
     }
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
 
     public int FindIdEnseignement (){
         int idClasse = FindIdClasseForStudent();
@@ -1086,19 +1473,29 @@ public class RootFenetre extends JFrame {
         return new ProfesseurDAO(maconnexion).FindEnseignement(new Enseignement(1, idClasse, idDiscipline, idProf));
     }
 
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
     public int FindIdBulletin (){
-        /**
-         * RAJOUTER LA NOTION DE TRIMESTRE
-         */
         int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
         int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
 
         return new BulletinDAO(maconnexion).findOne(idTrimestre, FindIdInscription()).get(0).getId();
     }
 
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
     public int FindIdBetailsBulletin () {
         return  new DetailsBulletinDAO(maconnexion).findOne(FindIdBulletin(), FindIdEnseignement()).get(0).getId();
     }
+
+    /**
+     * Find Id of object  de la comBoBox
+     * @return int
+     */
 
     public int FindIdTrimestre (){
         return new TrimestreDAO(maconnexion).findOne(FindIdYear(), (int) comboBoxSelectTrimestre.getSelectedItem()).getId();
@@ -1116,7 +1513,9 @@ public class RootFenetre extends JFrame {
             comboBoxSelectYear.addItem(anneeScolaire.getYear());
         });
     }
-
+    /**
+     * Refill the combxbox of Level
+     */
     public void refillComboBoxLevel () {
 
         comboBoxSelectLevel.removeAllItems();
@@ -1126,6 +1525,9 @@ public class RootFenetre extends JFrame {
         });
     }
 
+    /**
+     * Refill the combxbox of classe
+     */
     public void refillComboBoxClasse () {
         comboBoxSelectClasse.removeAllItems();
 
@@ -1139,7 +1541,9 @@ public class RootFenetre extends JFrame {
             comboBoxSelectClasse.addItem(classe.getName());
         });
     }
-
+    /**
+     * Refill the combxbox of student
+     */
     public void refillComboBoxStudent () {
         comboBoxSelectStudent.removeAllItems();
         int idClasse = FindIdClasseForStudent();
@@ -1149,6 +1553,9 @@ public class RootFenetre extends JFrame {
         });
     }
 
+    /**
+     * Refill the combxbox of teacher
+     */
     public void refillComboBoxTeacher () {
         comboBoxSelectTeacher.removeAllItems();
         int idClasse = FindIdClasseForStudent();
@@ -1159,7 +1566,9 @@ public class RootFenetre extends JFrame {
         });
     }
 
-
+    /**
+     * Refill the combxbox of discpline
+     */
     public void refillComboBoxDiscipline (){
         comboBoxSelectDispline.removeAllItems();
         int idClasse = FindIdClasseForStudent();
@@ -1170,45 +1579,72 @@ public class RootFenetre extends JFrame {
         });
 
     }
-
+    /**
+     * Refill the combxbox of new grades
+     */
     public void refillComboBoxSelectNewGrades () {
+        comboBoxSelectNewGrades.removeAllItems();
         for (int i=0; i<21; i++){
             comboBoxSelectNewGrades.addItem(i);
         }
     }
-
+    /**
+     * Refill the combxbox of trimestre
+     */
     public void refillComboBoxSelectTrimestre () {
+        comboBoxSelectTrimestre.removeAllItems();
         for (int i =1; i<3; i++) {
             comboBoxSelectTrimestre.addItem(i);
         }
     }
-
+    /**
+     * Refill the combxbox of annee scolaire de la classe ( create a classe)
+     */
     public void refillSelectNewYearClasse (){
         SelectNewYearClasse.removeAllItems();
         new AnneeScolaireDA0(maconnexion).findAll().forEach(anneeScolaire -> { SelectNewYearClasse.addItem(anneeScolaire.getYear());
         });
     }
-
+    /**
+     * Refill the combxbox of new level classe ( create a classe)
+     */
     public void refillSelectNewLevelClasse () {
         SelectNewLevelClasse.removeAllItems();
         new NiveauDAO(maconnexion).findAll().forEach(niveau -> { SelectNewLevelClasse.addItem(niveau.getNom()); });
     }
 
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableSchoolYear () {
         tableSchoolYear.setModel(new TableAnneScolaire(new AnneeScolaireDA0(maconnexion).findAll()));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableStudentPresent (int idClasse) {
         tableStudentPresent.setModel(new TableStudent(new DAOEleve(maconnexion).findAll(idClasse)));
     }
 
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableStudentAbsent () {
         String yearClasse = (String) comboBoxSelectYear.getSelectedItem();
         int idyearClasse = new AnneeScolaireDA0(maconnexion).find(1, yearClasse).getId();
         tableStudentAbsent.setModel(new TableStudent(new DAOEleve(maconnexion).findAllAbsent(idyearClasse)));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableClasse () {
         String yearClasse = (String) comboBoxSelectYear.getSelectedItem();
         String levelClasse = (String) comboBoxSelectLevel.getSelectedItem();
@@ -1217,18 +1653,30 @@ public class RootFenetre extends JFrame {
         tableClasse.setModel(new TableClasse(new ClasseDA0(maconnexion).findAll(0, idyearClasse, idLevelClasse)));
 
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableNiveau () {
         tableLevelSchool.setModel(new TableLevel(new NiveauDAO(maconnexion).findAll()));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableDiscipline () {
 
         int idClasse = FindIdClasseForStudent();
 
         tableDisciplinePresent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll(idClasse)));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableDisplineNotPresent (){
         String year = (String) comboBoxSelectYear.getSelectedItem();
         String level = (String) comboBoxSelectLevel.getSelectedItem();
@@ -1238,34 +1686,62 @@ public class RootFenetre extends JFrame {
         System.out.println(idLevel);
         tableDisciplineAbsent.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAllAbsent(idyear, idLevel)));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableDisciplineSchool () {
         tableDisplineSchool.setModel(new TableDiscipline(new DisciplineDAO(maconnexion).findAll()));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableStudentSchool (){
         tableStudentSchool.setModel(new TableStudent(new DAOEleve(maconnexion).findAllStudent()));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableTeacherSchool() {
         tableTeacherSchool.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).findAllTeacher()));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableTeacherPresent () {
         int idDiscipline = new DisciplineDAO(maconnexion).find(1, (String) comboBoxSelectDispline.getSelectedItem()).getId_discipline();
         tableTeacherPresent.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).FindTeacher(FindIdClasseForStudent(), idDiscipline)));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableTeacherAbsent () {
         tableTeacherAbsent.setModel(new TableTeacher(new ProfesseurDAO(maconnexion).findAllAbsent(FindIdClasseForStudent())));
 
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTrimestre () {
         String Year = (String) tableSchoolYear.getValueAt(tableSchoolYear.getSelectedRow(), tableSchoolYear.getSelectedColumn());
         tableTrimestre.setModel(new TableTrimestre(new TrimestreDAO(maconnexion).findAll( new AnneeScolaireDA0(maconnexion).find(1, Year))));
     }
-
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableNotes (){
         System.out.println(" id Enseignement :: " + FindIdEnseignement() + "  Id Inscription  :: " + FindIdInscription() );
         int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
@@ -1274,55 +1750,80 @@ public class RootFenetre extends JFrame {
         TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(FindIdEnseignement(), FindIdInscription(), idTrimestre));
         tableStudentNotes.setModel(table);
         JLabelSumStudent.setText(comboBoxSelectDispline.getSelectedItem() + " Sum :: " + table.getSum() + "20");
-    }
 
+        JLabelComments.setText(table.getComments(new DetailsBulletinDAO(maconnexion).findcomment(FindIdBetailsBulletin())));
+    }
+    /**
+     * Methode pour remplir les JTables
+     * Pour se faire on appelle les classe Table...(nom de la classe)
+     * avec les données que l'on en appellant les methodes FindALL()
+     */
     public void refillTableBulletin (){
         int numero = (int) comboBoxSelectTrimestre.getSelectedItem();
         int idTrimestre = new TrimestreDAO(maconnexion).findOne(FindIdYear(), numero).getId();
 
+        /**
+         * On récupère les noms des displine
+         */
+        ArrayList<Discipline> arrayListDispline = new DisciplineDAO(maconnexion).findAll(FindIdClasseForStudent());
+
+        /**
+         * On recupère les moyennes des displines
+         */
         ArrayList<Enseignement> arraylist = new EnseignementDA0(maconnexion).findAll(FindIdClasseForStudent());
-        ArrayList<Discipline> listDispline = new ArrayList<>();
-
-        for (int i=0; i<arraylist.size(); i++){
-            listDispline.add(new DisciplineDAO(maconnexion).find(i));
-        }
-
         ArrayList<Double> listSum = new ArrayList<>();
-
-        for (int i=0; i<0; i++) {
+        for (int i=0; i<arrayListDispline.size(); i++) {
             TableStudentGrades table = new TableStudentGrades(new EvaluationDAO(maconnexion).findAll(arraylist.get(i).getId(), FindIdInscription(), idTrimestre));
             listSum.add(table.getSum());
         }
 
-        tableBulletinsClasse.setModel(new TableBulletin(listSum, listDispline));
+        /**
+         * On récupère les commentaires de chacune des matières
+         */
+        ArrayList <String> listComment = new ArrayList<>();
+        new DetailsBulletinDAO(maconnexion).findAll(FindIdBulletin()).forEach(detailsBulletin -> {
+            listComment.add(detailsBulletin.getCommentaire());
+        });
+
+        /**
+         * On met tous les éléments du dans la classe BulletinClasse
+         *
+         */
+
+        ArrayList<BulletinClasse> bulletin = new ArrayList<>();
+        for (int i = 0; i<arrayListDispline.size(); i++){
+            bulletin.add(new BulletinClasse(arrayListDispline.get(i).getNom_classe(), listSum.get(i), listComment.get(i), ""));
+        }
+
+        TableBulletinTrimestre table = new TableBulletinTrimestre(bulletin);
+        tableBulletinsClasse.setModel(table);
+        JLabelCommentBulletin.setText(table.getComments(new BulletinDAO(maconnexion).find(FindIdBulletin(), "").getCommentaire()));
+
     }
 
-
-
+    /**
+     * Fin des méthode de la classe RootFenetre
+     */
     private void createUIComponents() {
-        // TODO: place custom component creation code here
+        /**
+         * Initialisaton de toutes les JTable de la classe RootFenetre
+         *
+         */
         tableSchoolYear = new JTable(new TableAnneScolaire());
-
         tableStudentPresent = new JTable(new TableStudent());
         tableStudentAbsent = new JTable(new TableStudent());
-
         tableClasse = new JTable(new TableClasse());
         tableLevelSchool = new JTable(new TableLevel());
         tableDisciplinePresent = new JTable(new TableDiscipline());
         tableDisciplineAbsent = new JTable(new TableDiscipline());
         tableDisplineSchool = new JTable(new TableDiscipline());
-
         tableStudentSchool = new JTable(new TableStudent());
         tableTeacherSchool = new JTable(new TableTeacher());
-
         tableTeacherPresent = new JTable(new TableTeacher());
         tableTeacherAbsent = new JTable(new TableTeacher());
-
         tableTrimestre = new JTable(new TableTrimestre());
-
         tableStudentNotes = new JTable(new TableStudentGrades());
-
-        tableBulletinsClasse = new JTable(new TableBulletin());
+        tableBulletinsClasse = new JTable(new TableBulletinTrimestre());
 
     }
 }
