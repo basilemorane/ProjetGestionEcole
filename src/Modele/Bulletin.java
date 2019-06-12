@@ -6,7 +6,7 @@ package Modele;
  * un constructeur par default
  * un constructeur avec paramètre
  * getter et setters de tous les attributs de la classe
- */
+ */ 
 
 public class Bulletin {
     private int id;
