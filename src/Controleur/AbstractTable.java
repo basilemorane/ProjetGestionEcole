@@ -2,16 +2,19 @@ package Controleur;
 
 import javax.swing.table.AbstractTableModel;
 
-public  class AbstractTable extends AbstractTableModel {
+/**
+ * Claas par default de JModeleTable
+ * N'est pas utiliser dans le projet
+ */
+public class AbstractTable extends AbstractTableModel {
 
    public  AbstractTable(){
 
    }
 
-
     @Override
     public int getColumnCount() {
-        return 4;
+        return 1;
     }
 
     @Override
@@ -26,6 +29,6 @@ public  class AbstractTable extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        return "ez";
+        return "";
     }
 }

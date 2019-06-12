@@ -9,6 +9,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+
+
+/**
+ * Classe Niveau DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class NiveauDAO extends Controleur<Niveau>{
     private int nombre_niveau;
     private int nombre;
@@ -21,14 +35,13 @@ public class NiveauDAO extends Controleur<Niveau>{
 
     public boolean create(Niveau obj) throws ExceptionAlreadyExistant {
         try {
-            for (int i=1; i< nombre_niveau + 1; i++){
                 ResultSet result = this.connect.getConn().createStatement(
                         ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Niveau WHERE id_niveau =" + i + " AND nom_niveau = '" + obj.getNom() + "'");
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Niveau WHERE  nom_niveau = '" + obj.getNom() + "'");
                 if(result.first()) {
                     throw new ExceptionAlreadyExistant();
                 }
-            }
+
             Statement stmt =  this.connect.getConn().createStatement();
             stmt.executeUpdate("Insert INTO Niveau VALUES (Null,'" + obj.getNom()+"')");
             System.out.println("New school level create in the databse : ");
@@ -40,27 +53,32 @@ public class NiveauDAO extends Controleur<Niveau>{
         }
     }
 
-    public boolean delete(Niveau obj) {
+    public boolean delete(Niveau obj) throws ExceptionNotExisting {
         try {
-            for ( int i=1; i< this.nombre_niveau+2; i++) {
+            if ( find (obj).getId() != 0) {
                 Statement stmt = this.connect.getConn().createStatement();
-                stmt.executeUpdate("Delete From Niveau Where id_niveau= " + i + " AND nom_niveau = '" + obj.getNom() + "'");
-            }
-            System.out.println("School level delete ");
-
-            return true;
+                stmt.executeUpdate("Delete From Niveau Where id_niveau = " + find (obj).getId() );
+                System.out.println("School level delete " + obj.getNom());
+                return true;
+            } else
+                throw new ExceptionNotExisting();
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public boolean update(Niveau obj, String newName) {
+    public boolean update(Niveau obj, String newName) throws ExceptionAlreadyExistant{
         try {
-        for ( int i=1; i< this.nombre_niveau+1; i++) {
+            ResultSet result = this.connect.getConn().createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Niveau WHERE  nom_niveau = '" + newName + "'");
+            if(result.first()) {
+               throw new ExceptionAlreadyExistant();
+            }
             Statement stmt = this.connect.getConn().createStatement();
-            stmt.executeUpdate("Update Niveau Set nom_niveau = '" + newName + "' Where id_niveau= " + i + " AND nom_niveau = '" + obj.getNom() + "'");
-        }
+            stmt.executeUpdate("Update Niveau Set nom_niveau = '" + newName + "' Where  nom_niveau = '" + obj.getNom() + "'");
+
         System.out.println("School level updating");
         return true;
         } catch (SQLException e) {
@@ -137,7 +155,21 @@ public class NiveauDAO extends Controleur<Niveau>{
     }
 
     public Niveau find (Niveau obj){
-        return obj;
+        Niveau niveau = new Niveau();
+
+        try {
+                ResultSet result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM Niveau WHERE nom_niveau ='" + obj.getNom() + "'");
+                if (result.first())
+                    niveau = new Niveau(
+                            result.getInt("id_niveau"),
+                            result.getString("nom_niveau")
+                    );
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return niveau;
     }
 }
 

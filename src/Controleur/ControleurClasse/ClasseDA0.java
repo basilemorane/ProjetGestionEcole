@@ -9,6 +9,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+/**
+ * Classe Classe DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class ClasseDA0 extends Controleur<Classe>{
     private int nombre_classe;
     private int nombre;
@@ -39,7 +51,7 @@ public class ClasseDA0 extends Controleur<Classe>{
         }
     }
 
-    public boolean delete(Classe obj) {
+    public boolean delete(Classe obj) throws ExceptionNotExisting {
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -49,11 +61,11 @@ public class ClasseDA0 extends Controleur<Classe>{
                 stmt.executeUpdate("Delete From Classe Where id_classe = " + result.getInt("id_classe"));
                 return true;
             }
+            throw new ExceptionNotExisting();
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-        return false;
     }
 
     public boolean update(Classe obj, String newName) {
@@ -78,19 +90,21 @@ public class ClasseDA0 extends Controleur<Classe>{
         Classe TD = new Classe();
 
         try {
-            ResultSet result = this.connect.getConn().createStatement(
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery(
-                            "SELECT * FROM Classe WHERE id_classe =" + id + " AND id_annee_scolaire = " + idyear + " AND id_niveau =" + idniveau);
-                   // "SELECT id_classe, classe.id_niveau, classe.id_annee_scolaire, nom_classe FROM classe LEFT JOIN niveau ON classe.id_niveau = "+ idniveau + " LEFT JOIN anneescolaire ON anneescolaire.id_annee_scolaire = " + idyear + " WHERE id_classe = " + id);
+            for (int i=0; i< nombre_classe+1; i++) {
+                ResultSet result = this.connect.getConn().createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery(
+                        "SELECT * FROM Classe WHERE id_classe =" + id + " AND id_annee_scolaire = " + idyear + " AND id_niveau =" + idniveau);
+                // "SELECT id_classe, classe.id_niveau, classe.id_annee_scolaire, nom_classe FROM classe LEFT JOIN niveau ON classe.id_niveau = "+ idniveau + " LEFT JOIN anneescolaire ON anneescolaire.id_annee_scolaire = " + idyear + " WHERE id_classe = " + id);
 
-            if(result.first()) {
-                TD = new Classe(
-                        result.getInt("id_classe"),
-                        result.getString("nom_classe"),
-                        idyear,
-                        idniveau
-                );
+                if (result.first()) {
+                    TD = new Classe(
+                            result.getInt("id_classe"),
+                            result.getString("nom_classe"),
+                            idyear,
+                            idniveau
+                    );
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -124,15 +138,15 @@ public class ClasseDA0 extends Controleur<Classe>{
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM classe WHERE id_ecole = 1 AND nom_classe ='" + obj.getName() +"' AND id_niveau =" + obj.getIdNiveau() + " AND id_annee_scolaire = " + obj.getIdAnneeScolaire());
-            if(result.first()) {
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM classe WHERE nom_classe ='" + obj.getName() +"' AND id_niveau =" + obj.getIdNiveau() + " AND id_annee_scolaire = " + obj.getIdAnneeScolaire());
+            if(result.first())
             classe = new Classe(
                         result.getInt("id_classe"),
                         result.getString("nom_classe"),
                         result.getInt("id_niveau"),
                         result.getInt("id_annee_scolaire")
                 );
-            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -162,10 +176,6 @@ public class ClasseDA0 extends Controleur<Classe>{
         return TD;
     }
 
-    public Classe recherch (int id, String name){
-        Classe classe = new Classe();
-        return classe;
-    }
     public ArrayList<Classe> findAll () {
         ArrayList<Classe> ArrayList = new ArrayList<>();
         try {

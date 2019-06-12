@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public abstract class Controleur <T> {
 
-        protected Connexion connect = null;
+        protected Connexion connect;
 
         public Controleur(Connexion conn){
             this.connect = conn;
@@ -23,21 +23,14 @@ public abstract class Controleur <T> {
          * @param obj
          * @return boolean
          */
-        public abstract boolean delete(T obj);
+        public abstract boolean delete(T obj) throws ExceptionNotExisting;
 
         /**
          * Méthode de mise à jour
          * @param obj
          * @return boolean
          */
-        public abstract boolean update(T obj, String newName);
-
-        /**
-         * Méthode de recherche des informations
-         * @param id
-         * @return T
-         */
-        public abstract T find(int id);
+        public abstract boolean update(T obj, String newName) throws ExceptionAlreadyExistant;
 
         /**
          * Méthode de recherche des informations
@@ -45,15 +38,22 @@ public abstract class Controleur <T> {
          * @return T
          */
 
+        /**
+         * Methode pour retrouver un object dans la base donnée s
+         * @param id
+         * @param name
+         * @return
+         */
+
         public abstract T find (int id, String name);
 
         public abstract T find (int id, int id1, int id2);
 
-        public abstract T recherch (int id, String name);
-
         public abstract T find (T obj);
 
         public abstract ArrayList<T> findAll();
+
+
 
 
     }
