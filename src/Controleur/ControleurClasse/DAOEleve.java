@@ -8,14 +8,26 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+/**
+ * Classe Eleve  DAO
+ * permet de recuperer les données dans la base de donnée pour la classe correspondante
+ *      - un constructeur avec paramètre
+ *      - une methdde create
+ *      - une methode delete
+ *      - une methode update
+ *      - methode find () (Object)
+ *      - methode findALL() (ArrayList <Object>)
+ *
+ */
+
 public class DAOEleve extends Controleur<Eleve> {
         private int nombre;
         private int nombre_eleve;
 
         public DAOEleve(Connexion conn) {
             super(conn);
-            nombre = findAll().size()-1;
-            nombre_eleve = findAll().get(nombre).getId();
+           // nombre = findAll().size()-1;
+           // nombre_eleve = findAll().get(nombre).getId();
         }
 
         public boolean create(Eleve obj) throws ExceptionAlreadyExistant {
@@ -29,7 +41,6 @@ public class DAOEleve extends Controleur<Eleve> {
                     Statement stmt =  this.connect.getConn().createStatement();
                         stmt.executeUpdate("Insert INTO personne VALUES (Null,'" + obj.getNom()+"', '" + obj.getPrenom() + "', 0)");
                         System.out.println("New student create in the databse : ");
-                             this.nombre_eleve+=1;
                             return true;
                     } catch (SQLException e) {
                          e.printStackTrace();
@@ -111,11 +122,11 @@ public class DAOEleve extends Controleur<Eleve> {
 
     public Eleve find(int id, String name) {
         Eleve eleve = new Eleve();
-
+        String[] data = name.split(" ", 2);
         try {
             ResultSet result = this.connect.getConn().createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE nom_personne ='" + name + "'");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM personne WHERE nom_personne ='" + data[0] + "' AND prenom_personne = '" + data[1] +"'");
             if(result.first())
                 eleve = new Eleve(
                         result.getInt("id_personne"),
