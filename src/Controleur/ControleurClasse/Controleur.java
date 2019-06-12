@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public abstract class Controleur <T> {
 
-        protected Connexion connect = null;
+        protected Connexion connect;
 
         public Controleur(Connexion conn){
             this.connect = conn;
@@ -34,15 +34,15 @@ public abstract class Controleur <T> {
 
         /**
          * Méthode de recherche des informations
-         * @param id
-         * @return T
-         */
-        public abstract T find(int id);
-
-        /**
-         * Méthode de recherche des informations
          * @param name
          * @return T
+         */
+
+        /**
+         * Methode pour retrouver un object dans la base donnée s
+         * @param id
+         * @param name
+         * @return
          */
 
         public abstract T find (int id, String name);
